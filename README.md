@@ -9,4 +9,4 @@ scancode_run_scan.py : example of scanning a repo using ScanCode (requires ScanC
 
 scancode_library_run_scan.py : example of scanning a repo programmatically using ScanCode (other examples use subprocess and command line)
 
-download_repo_run_scan.py : example of downloading a (hardcoded) repo zip file from GitHub, unzipping it, and scanning it.
+download_repo_run_scan.py : example of downloading a repo from GitHub using a command line argument url to the zip file, unzipping the file, and scanning it.
