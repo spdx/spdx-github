@@ -4,8 +4,7 @@
 #Future updates:
 #1. Display help information if user didn't supply correct arguments
 #2. Handle if user did not give url to a zip file download
-#3. Save SPDX to document instead of stdout
-#4. Clearer methods (currently scan method also downloads and unzips as well as scans)
+#3. Clearer methods (currently scan method also downloads and unzips as well as scans)
 
 import subprocess
 from subprocess import call
@@ -46,11 +45,13 @@ def scan(repo_zip_url):
 	#Remove the zip file
 	remove(file_location)
 
+	#Set output file name to the directory name .SPDX
+	spdx_file_name = extracted_directory[:-1] + '.SPDX'
+
 	#Scan the unzipped directory
-	print subprocess.check_output(['scancode',extracted_directory,'--format','spdx-tv'])
+	print subprocess.check_output(['scancode','--format','spdx-tv',extracted_directory,spdx_file_name])
 
 	#Remove the unzipped directory
 	shutil.rmtree(extracted_directory)
-
 
 if __name__ == "__main__": main()
