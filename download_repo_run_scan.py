@@ -77,9 +77,9 @@ def download_github_zip(repo_zip_url):
 def check_valid_url(repo_zip_url):
 	#get just the head
 	request = requests.head(repo_zip_url)
-	#It should be success (200's) or redirect(300's)
-	#Otherwise, inform user of failure
-	if (request.status_code >= 400 or request.status_code < 200):
+	#It should not be a client or server error.
+	#If it is, inform user of failure
+	if (request.status_code >= 400):
 		print("Could not reach URL provided.\n")
 		print("Provided url was " + repo_zip_url + " and resulted in status code " + str(request.status_code))
 		sys.exit()
