@@ -4,7 +4,6 @@
 #Future updates:
 #1. Display help information if user didn't supply correct arguments
 #2. Handle if user did not give url to a zip file download
-#3. Clearer methods (currently scan method also downloads and unzips as well as scans)
 
 import subprocess
 from subprocess import call
@@ -16,9 +15,44 @@ import zipfile
 import sys
 
 def main():
-	scan(sys.argv[1])
+	#Argument is the url of the GitHub zip file
+	repo_zip_url = sys.argv[1]
+	#Download the zip and get its path
+	file_location = download_github_zip(repo_zip_url)
+	#extract the zip and get path of extracted directory
+	extracted_directory = unzip_file(file_location)
 
-def scan(repo_zip_url):
+	#Set output file name to the directory name .SPDX
+	spdx_file_name = extracted_directory[:-1] + '.SPDX'
+
+	#scan the extracted directory and put results in a named file
+	scan(extracted_directory, spdx_file_name)
+
+	#Remove the zip file
+	remove(file_location)
+	#Remove the unzipped directory
+	shutil.rmtree(extracted_directory)
+
+def scan(directory_to_scan, spdx_file_name):
+	#Scan the unzipped directory
+	print subprocess.check_output(['scancode','--format','spdx-tv',directory_to_scan,spdx_file_name])
+
+
+#Unzip a zip file and return the path to the extracted directory
+def unzip_file(file_location):
+	#Unzip the zip file
+	zip_file = zipfile.ZipFile(file_location, 'r')
+	zip_file.extractall()
+	#Get the directory that results from unzipping
+	#(Assume there is only one)
+	extracted_directory = (zip_file.namelist())[0]
+	zip_file.close()
+	#return the path to the extracted directory
+	return extracted_directory
+
+
+#Download a zip file and return the path of the downloaded file
+def download_github_zip(repo_zip_url):
 	#Getting a zip file to download
 	to_scan = requests.get(repo_zip_url, stream=True)
 
@@ -34,24 +68,7 @@ def scan(repo_zip_url):
 	with open(file_location, 'wb') as fd:
 		for chunk in to_scan.iter_content(chunk_size=1024):
 			fd.write(chunk)
-
-	#Unzip the zip file
-	zip_file = zipfile.ZipFile(file_location, 'r')
-	zip_file.extractall()
-	#Get the directory that results from unzipping
-	#(Assume there is only one)
-	extracted_directory = (zip_file.namelist())[0]
-	zip_file.close()
-	#Remove the zip file
-	remove(file_location)
-
-	#Set output file name to the directory name .SPDX
-	spdx_file_name = extracted_directory[:-1] + '.SPDX'
-
-	#Scan the unzipped directory
-	print subprocess.check_output(['scancode','--format','spdx-tv',extracted_directory,spdx_file_name])
-
-	#Remove the unzipped directory
-	shutil.rmtree(extracted_directory)
+	#return path to the downloaded file
+	return file_location	
 
 if __name__ == "__main__": main()
