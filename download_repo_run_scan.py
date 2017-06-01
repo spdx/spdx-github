@@ -1,8 +1,6 @@
 #This is an example of downloading a repo zip file, 
 #unzipping it and running a scan on it.
 #The example uses scancode, but dosocsv2 could also be used.
-#Future updates:
-#Handle if user did not give url to a zip file download
 
 import subprocess
 from subprocess import call
@@ -20,6 +18,7 @@ import click
 def main(url):
 	#Argument is the url of the GitHub zip file
 	repo_zip_url = url
+	check_valid_url(repo_zip_url)
 	#Download the zip and get its path
 	file_location = download_github_zip(repo_zip_url)
 	#extract the zip and get path of extracted directory
@@ -73,5 +72,16 @@ def download_github_zip(repo_zip_url):
 			fd.write(chunk)
 	#return path to the downloaded file
 	return file_location	
+
+#Check that the url for the zip file can be reached
+def check_valid_url(repo_zip_url):
+	#get just the head
+	request = requests.head(repo_zip_url)
+	#It should be success (200's) or redirect(300's)
+	#Otherwise, inform user of failure
+	if (request.status_code >= 400 or request.status_code < 200):
+		print("Could not reach URL provided.\n")
+		print("Provided url was " + repo_zip_url + " and resulted in status code " + str(request.status_code))
+		sys.exit()
 
 if __name__ == "__main__": main()
