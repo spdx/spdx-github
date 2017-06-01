@@ -2,8 +2,7 @@
 #unzipping it and running a scan on it.
 #The example uses scancode, but dosocsv2 could also be used.
 #Future updates:
-#1. Display help information if user didn't supply correct arguments
-#2. Handle if user did not give url to a zip file download
+#Handle if user did not give url to a zip file download
 
 import subprocess
 from subprocess import call
@@ -13,10 +12,14 @@ from os import path, remove
 import shutil
 import zipfile
 import sys
+import click
 
-def main():
+@click.command()
+@click.option('--url', prompt='The url of the GitHub repo zip file to scan', help='The url of the GitHub repo zip file to scan.')
+
+def main(url):
 	#Argument is the url of the GitHub zip file
-	repo_zip_url = sys.argv[1]
+	repo_zip_url = url
 	#Download the zip and get its path
 	file_location = download_github_zip(repo_zip_url)
 	#extract the zip and get path of extracted directory
