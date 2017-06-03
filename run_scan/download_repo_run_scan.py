@@ -18,6 +18,10 @@ import click
 def main(url):
 	#Argument is the url of the GitHub zip file
 	repo_zip_url = url
+	download_repo_run_scan(repo_zip_url)
+
+#The overall process of downloading and scanning a repo
+def download_repo_run_scan(repo_zip_url):
 	#If url gives error, exit
 	if(check_valid_url(repo_zip_url) == False):
 		sys.exit()
