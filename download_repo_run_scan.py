@@ -18,7 +18,9 @@ import click
 def main(url):
 	#Argument is the url of the GitHub zip file
 	repo_zip_url = url
-	check_valid_url(repo_zip_url)
+	#If url gives error, exit
+	if(check_valid_url(repo_zip_url) == False):
+		sys.exit()
 	#Download the zip and get its path
 	file_location = download_github_zip(repo_zip_url)
 	#extract the zip and get path of extracted directory
@@ -77,11 +79,13 @@ def download_github_zip(repo_zip_url):
 def check_valid_url(repo_zip_url):
 	#get just the head
 	request = requests.head(repo_zip_url)
-	#It should not be a client or server error.
-	#If it is, inform user of failure
-	if (request.status_code >= 400):
+	#It should be success (200's) or redirect(300's)
+	#Otherwise, inform user of failure
+	if (request.status_code >= 400 or request.status_code < 200):
 		print("Could not reach URL provided.\n")
 		print("Provided url was " + repo_zip_url + " and resulted in status code " + str(request.status_code))
-		sys.exit()
+		return False
+	else:
+		return True
 
 if __name__ == "__main__": main()
