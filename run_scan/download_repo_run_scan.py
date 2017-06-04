@@ -18,13 +18,13 @@ import click
 def main(url):
 	#Argument is the url of the GitHub zip file
 	repo_zip_url = url
+	#If url gives error, exit
+	if(check_valid_url(repo_zip_url) == False):
+		sys.exit()
 	download_repo_run_scan(repo_zip_url)
 
 #The overall process of downloading and scanning a repo
 def download_repo_run_scan(repo_zip_url):
-	#If url gives error, exit
-	if(check_valid_url(repo_zip_url) == False):
-		sys.exit()
 	#Download the zip and get its path
 	file_location = download_github_zip(repo_zip_url)
 	#extract the zip and get path of extracted directory
@@ -40,6 +40,8 @@ def download_repo_run_scan(repo_zip_url):
 	remove(file_location)
 	#Remove the unzipped directory
 	shutil.rmtree(extracted_directory)
+	
+	return spdx_file_name
 
 def scan(directory_to_scan, spdx_file_name):
 	#Scan the unzipped directory
