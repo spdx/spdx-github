@@ -3,6 +3,18 @@ import download_repo_run_scan
 from os import path, remove
 import shutil
 
+#This tests a method that runs through the whole scanning process.
+#Since it calls a few other methods, it will fail also if those methods fail.
+class wholeScanTestCase(unittest.TestCase):
+	url = 'https://github.com/OSSHealth/ghdata/archive/master.zip'
+	spdx_file_name = ''
+	def setUp(self):
+		self.spdx_file_name = download_repo_run_scan.download_repo_run_scan(self.url)
+	def tearDown(self):
+		remove(self.spdx_file_name)
+	def testWholeScan(self):
+		assert path.isfile(self.spdx_file_name)
+
 #Test that when given a valid zip file url,
 #the download_github_zip will result in the creation
 #of a local file at the returned location
