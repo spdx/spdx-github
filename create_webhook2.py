@@ -1,6 +1,6 @@
 import requests
 
-#a simple api request that requires authentication
+#a simple API request that requires authentication
 r = requests.get('https://api.github.com/user', auth=('abuhman', 'abuhmanspassword'))
 #response is 200 ok
 print r
