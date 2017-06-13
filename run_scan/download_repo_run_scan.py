@@ -11,6 +11,7 @@ import shutil
 import zipfile
 import sys
 import click
+from yaml import safe_load, dump
 
 @click.command()
 @click.option('--url', prompt='The url of the GitHub repo zip file to scan', help='The url of the GitHub repo zip file to scan.')
@@ -30,11 +31,17 @@ def download_repo_run_scan(repo_zip_url):
 	#extract the zip and get path of extracted directory
 	extracted_directory = unzip_file(file_location)
 
-	#Set output file name to the directory name .SPDX
-	spdx_file_name = extracted_directory[:-1] + '.SPDX'
+	config_file = extracted_directory + 'configuration.YAML'
+
+	configuration = get_config(config_file)
+	suffix = configuration['output_file_name'][-5:]
+	if(suffix != '.SPDX' and suffix != '.spdx'):
+		spdx_file_name = configuration['output_file_name'] + '.SPDX'
+	else:
+		spdx_file_name = configuration['output_file_name']
 
 	#scan the extracted directory and put results in a named file
-	scan(extracted_directory, spdx_file_name)
+	scan(extracted_directory, spdx_file_name, 'scancode', configuration['output_type'])
 
 	#Remove the zip file
 	remove(file_location)
@@ -43,10 +50,13 @@ def download_repo_run_scan(repo_zip_url):
 	
 	return spdx_file_name
 
-def scan(directory_to_scan, spdx_file_name):
+def scan(directory_to_scan, output_file_name, scanner, output_type):
+	if(output_type == 'tag-value'):
+		output_format = 'spdx-tv'
+	elif(output_type == 'rdf'):
+		output_format = 'spdx-rdf'
 	#Scan the unzipped directory
-	print subprocess.check_output(['scancode','--format','spdx-tv',directory_to_scan,spdx_file_name])
-
+	print subprocess.check_output(['scancode','--format', output_format,directory_to_scan,output_file_name])
 
 #Unzip a zip file and return the path to the extracted directory
 def unzip_file(file_location):
@@ -80,6 +90,11 @@ def download_github_zip(repo_zip_url):
 			fd.write(chunk)
 	#return path to the downloaded file
 	return file_location	
+
+def get_config(config_file):
+	stream = file(config_file, 'r')
+	configuration = safe_load(stream)
+	return configuration
 
 #Check that the url for the zip file can be reached
 def check_valid_url(repo_zip_url):
