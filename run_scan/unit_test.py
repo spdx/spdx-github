@@ -30,9 +30,7 @@ class downloadFileTestCase(unittest.TestCase):
 	def testDownload(self):
 		assert path.isfile(self.file_location)
 
-#Test that we can unzip a zip file.  This requires a zip file to be present.
-#For this I am using the same download method as above to get a zip file
-#from GitHub, so both tests will fail if the download method fails
+#Test that we can unzip a zip file.
 class unzipFileTestCase(unittest.TestCase):
 	file_location = 'test.zip'
 	extracted_directory = ''
@@ -47,7 +45,6 @@ class unzipFileTestCase(unittest.TestCase):
 		assert 	path.isdir(self.extracted_directory)
 
 #This tests whether a file output is produced from calling the scan method.
-#It needs the download zip and extract zip methods to be working.
 class scanTestCase(unittest.TestCase):
 	directory = 'test2/'
 	spdx_file_name = ''
