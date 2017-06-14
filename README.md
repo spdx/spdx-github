@@ -4,9 +4,9 @@ SPDX Github Integration Tools
 
 These instructions were made on Ubuntu 14.04.  They assume that Python has already been installed.
 
-#Main installation:
+# Main installation:
 
-##Install the ScanCode scanner:
+## Install the ScanCode scanner:
 
 Download scancode from https://github.com/nexB/scancode-toolkit/archive/v2.0.0.rc2.zip
 
@@ -17,14 +17,14 @@ Change directories into the new unzipped directory using this terminal command: 
 Configure scancode using the terminal command: ./scancode --help
 
 
-##Get the SPDX-GitHub repo:
+## Get the SPDX-GitHub repo:
 
 Download SPDX-GitHub from https://github.com/spdx/spdx-github/archive/master.zip
 
 Unzip SPDX-GitHub with this terminal command: unzip spdx-github-master.zip
 
 
-##Start the ScanCode virtual environment:
+## Start the ScanCode virtual environment:
 
 Change back into the scancode directory with: cd scancode-toolkit-2.0.0.rc2
 
@@ -37,7 +37,7 @@ Install the requests security package with this terminal command: pip install re
 The above should get a local instance working.  
 
 
-#Further installation instructions if the user would like to use webhooks:
+# Further installation instructions if the user would like to use webhooks:
 
 Firstly, in order to use webhooks, you must be an administrator of the repository you will be using webhooks for.  Otherwise, you will not have permission to create a webhook.
 
@@ -88,7 +88,7 @@ Click "Add webhook"
 You are now set up to run a new scan whenever a new push is made to your repository.
 
 
-#Useage (without webhooks):
+# Useage (without webhooks):
 
 Start the ScanCode virtual environment:
 
