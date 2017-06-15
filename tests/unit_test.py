@@ -61,7 +61,7 @@ class scanTestCase(unittest.TestCase):
     spdx_file_name = ''
 
     def setUp(self):
-        #Set output file name to the directory name .SPDX
+        #Set output file name to the directory name .SPDX.
         self.spdx_file_name = self.directory[:-1] + '.SPDX'
 
         #scan the extracted directory and put results in a named file
@@ -77,7 +77,7 @@ class scanTestCase(unittest.TestCase):
 
 
 #This checks whether the check_valid_url method correctly determines
-#whether a url results in an error (400 or 500 code)
+#whether a url results in an error (400 or 500 code).
 class checkURLTestCase(unittest.TestCase):
     good_url = 'https://www.google.com/'
     bad_url = 'https://www.google.com/fail'
