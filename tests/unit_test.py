@@ -11,7 +11,8 @@ class wholeScanTestCase(unittest.TestCase):
 	url = 'https://github.com/abuhman/test_webhooks/archive/master.zip'
 	spdx_file_name = ''
 	def setUp(self):
-		self.spdx_file_name = download_repo_run_scan.download_repo_run_scan(self.url)
+		self.spdx_file_name = 
+            download_repo_run_scan.download_repo_run_scan(self.url)
 	def tearDown(self):
 		remove(self.spdx_file_name)
 	def testWholeScan(self):
@@ -24,7 +25,8 @@ class downloadFileTestCase(unittest.TestCase):
 	file_location = ''
 	url = 'https://github.com/abuhman/test_webhooks/archive/master.zip'
 	def setUp(self):
-		self.file_location = download_repo_run_scan.download_github_zip(self.url)
+		self.file_location = 
+            download_repo_run_scan.download_github_zip(self.url)
 
 	def tearDown(self):
 		remove(self.file_location)
@@ -37,7 +39,8 @@ class unzipFileTestCase(unittest.TestCase):
 	file_location = 'test.zip'
 	extracted_directory = ''
 	def setUp(self):
-		self.extracted_directory = download_repo_run_scan.unzip_file(self.file_location)
+		self.extracted_directory = 
+            download_repo_run_scan.unzip_file(self.file_location)
 	
 	def tearDown(self):
 		#Remove the unzipped directory
@@ -55,7 +58,8 @@ class scanTestCase(unittest.TestCase):
 		self.spdx_file_name = self.directory[:-1] + '.SPDX'
 
 		#scan the extracted directory and put results in a named file
-		download_repo_run_scan.scan(self.directory, self.spdx_file_name, 'scancode', 'tag-value')
+		download_repo_run_scan.scan(self.directory, self.spdx_file_name, 
+                                    'scancode', 'tag-value')
 	def tearDown(self):
 		#Remove the scan results file
 		remove(self.spdx_file_name)

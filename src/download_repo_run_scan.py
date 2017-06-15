@@ -14,7 +14,8 @@ import click
 from yaml import safe_load, dump
 
 @click.command()
-@click.option('--url', prompt='The url of the GitHub repo zip file to scan', help='The url of the GitHub repo zip file to scan.')
+@click.option('--url', prompt='The url of the GitHub repo zip file to scan', 
+              help='The url of the GitHub repo zip file to scan.')
 
 def main(url):
 	#Argument is the url of the GitHub zip file
@@ -41,7 +42,8 @@ def download_repo_run_scan(repo_zip_url):
 		spdx_file_name = configuration['output_file_name']
 
 	#scan the extracted directory and put results in a named file
-	scan(extracted_directory, spdx_file_name, 'scancode', configuration['output_type'])
+	scan(extracted_directory, spdx_file_name, 'scancode', 
+         configuration['output_type'])
 
 	#Remove the zip file
 	remove(file_location)
@@ -56,7 +58,9 @@ def scan(directory_to_scan, output_file_name, scanner, output_type):
 	elif(output_type == 'rdf'):
 		output_format = 'spdx-rdf'
 	#Scan the unzipped directory
-	print subprocess.check_output(['scancode','--format', output_format,directory_to_scan,output_file_name])
+	print subprocess.check_output(['scancode','--format', 
+                                  output_format,directory_to_scan,
+                                  output_file_name])
 
 #Unzip a zip file and return the path to the extracted directory
 def unzip_file(file_location):
@@ -103,8 +107,9 @@ def check_valid_url(repo_zip_url):
 	#It should be success (200's) or redirect(300's)
 	#Otherwise, inform user of failure
 	if (request.status_code >= 400 or request.status_code < 200):
-		print("Could not reach URL provided.\n")
-		print("Provided url was " + repo_zip_url + " and resulted in status code " + str(request.status_code))
+		print('Could not reach URL provided.\n')
+		print('Provided url was ' + repo_zip_url + 
+              ' and resulted in status code ' + str(request.status_code))
 		return False
 	else:
 		return True
