@@ -33,7 +33,6 @@ def repo_scan(repo_zip_url):
     extracted_directory = unzip_file(file_location)
 
     config_file = extracted_directory + 'configuration.YAML'
-
     configuration = get_config(config_file)
     suffix = configuration['output_file_name'][-5:]
     if(suffix != '.SPDX' and suffix != '.spdx'):
@@ -73,7 +72,6 @@ def unzip_file(file_location):
     zip_file.close()
     #return the path to the extracted directory
     return extracted_directory
-
 
 #Download a zip file and return the path of the downloaded file
 def download_github_zip(repo_zip_url):
