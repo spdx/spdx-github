@@ -1,7 +1,7 @@
 import unittest
 import sys
 sys.path.append('../src')
-import download_repo_run_scan
+import repo_scan
 from os import path, remove
 import shutil    
 
@@ -12,7 +12,7 @@ class wholeScanTestCase(unittest.TestCase):
     spdx_file_name = ''
     def setUp(self):
         self.spdx_file_name = 
-            download_repo_run_scan.download_repo_run_scan(self.url)
+            repo_scan.repo_scan(self.url)
     def tearDown(self):
         remove(self.spdx_file_name)
     def testWholeScan(self):
@@ -26,7 +26,7 @@ class downloadFileTestCase(unittest.TestCase):
     url = 'https://github.com/abuhman/test_webhooks/archive/master.zip'
     def setUp(self):
         self.file_location = 
-            download_repo_run_scan.download_github_zip(self.url)
+            repo_scan.download_github_zip(self.url)
 
     def tearDown(self):
         remove(self.file_location)
@@ -40,7 +40,7 @@ class unzipFileTestCase(unittest.TestCase):
     extracted_directory = ''
     def setUp(self):
         self.extracted_directory = 
-            download_repo_run_scan.unzip_file(self.file_location)
+            repo_scan.unzip_file(self.file_location)
     
     def tearDown(self):
         #Remove the unzipped directory
@@ -58,7 +58,7 @@ class scanTestCase(unittest.TestCase):
         self.spdx_file_name = self.directory[:-1] + '.SPDX'
 
         #scan the extracted directory and put results in a named file
-        download_repo_run_scan.scan(self.directory, self.spdx_file_name, 
+        repo_scan.scan(self.directory, self.spdx_file_name, 
                                     'scancode', 'tag-value')
     def tearDown(self):
         #Remove the scan results file
@@ -74,10 +74,10 @@ class checkURLTestCase(unittest.TestCase):
     bad_url = 'https://www.google.com/fail'
     
     def testGoodURL(self):
-        assert download_repo_run_scan.check_valid_url(self.good_url) == True
+        assert repo_scan.check_valid_url(self.good_url) == True
 
     def testBadURL(self):
-        assert download_repo_run_scan.check_valid_url(self.bad_url) == False
+        assert repo_scan.check_valid_url(self.bad_url) == False
     
 
 

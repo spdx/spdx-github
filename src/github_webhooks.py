@@ -1,5 +1,5 @@
 from flask import Flask, request
-import download_repo_run_scan
+import repo_scan
 import json
 
 app = Flask(__name__)
@@ -11,7 +11,7 @@ def github_webhooks():
         parsed_data = json.loads(data)
         zipball = 'https://api.github.com/repos/' + 
                   parsed_data['repository']['full_name'] + '/zipball'
-        download_repo_run_scan.download_repo_run_scan(zipball)
+        repo_scan.repo_scan(zipball)
         return "Post"
     else:
         return "Get"

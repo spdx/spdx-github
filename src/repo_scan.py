@@ -23,10 +23,10 @@ def main(url):
     #If url gives error, exit
     if(check_valid_url(repo_zip_url) == False):
         sys.exit()
-    download_repo_run_scan(repo_zip_url)
+    repo_scan(repo_zip_url)
 
 #The overall process of downloading and scanning a repo
-def download_repo_run_scan(repo_zip_url):
+def repo_scan(repo_zip_url):
     #Download the zip and get its path
     file_location = download_github_zip(repo_zip_url)
     #extract the zip and get path of extracted directory
