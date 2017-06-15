@@ -108,8 +108,8 @@ def check_valid_url(repo_zip_url):
     #Otherwise, inform user of failure
     if (request.status_code >= 400 or request.status_code < 200):
         print('Could not reach URL provided.\n')
-        print('Provided url was ' + repo_zip_url + 
-              ' and resulted in status code ' + str(request.status_code))
+        print('Provided url was ' + repo_zip_url 
+              + ' and resulted in status code ' + str(request.status_code))
         return False
     else:
         return True
