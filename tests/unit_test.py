@@ -9,7 +9,7 @@ import repo_scan
 
 #This tests a method that runs through the whole scanning process.
 #Since it calls a few other methods, it will fail also if those methods fail.
-class wholeScanTestCase(unittest.TestCase):
+class WholeScanTestCase(unittest.TestCase):
     url = 'https://github.com/abuhman/test_webhooks/archive/master.zip'
     spdx_file_name = ''
 
@@ -26,7 +26,7 @@ class wholeScanTestCase(unittest.TestCase):
 #Test that when given a valid zip file url,
 #the download_github_zip will result in the creation
 #of a local file at the returned location
-class downloadFileTestCase(unittest.TestCase):
+class DownloadFileTestCase(unittest.TestCase):
     file_location = ''
     url = 'https://github.com/abuhman/test_webhooks/archive/master.zip'
 
@@ -41,7 +41,7 @@ class downloadFileTestCase(unittest.TestCase):
 
 
 #Test that we can unzip a zip file.
-class unzipFileTestCase(unittest.TestCase):
+class UnzipFileTestCase(unittest.TestCase):
     file_location = 'test.zip'
     extracted_directory = ''
     def setUp(self):
@@ -56,7 +56,7 @@ class unzipFileTestCase(unittest.TestCase):
 
 
 #This tests whether a file output is produced from calling the scan method.
-class scanTestCase(unittest.TestCase):
+class ScanTestCase(unittest.TestCase):
     directory = 'test2/'
     spdx_file_name = ''
 
@@ -78,7 +78,7 @@ class scanTestCase(unittest.TestCase):
 
 #This checks whether the check_valid_url method correctly determines
 #whether a url results in an error (400 or 500 code).
-class checkURLTestCase(unittest.TestCase):
+class CheckURLTestCase(unittest.TestCase):
     good_url = 'https://www.google.com/'
     bad_url = 'https://www.google.com/fail'
 
