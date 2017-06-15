@@ -63,7 +63,7 @@ install Flask using this command: pip install Flask
 
 Navigate to the spdx-github-master directory (where you unzipped SPDX-GitHub earlier).
 
-Run the following terminal command: python run_scan/github_webhooks.py
+Run the following terminal command: python src/github_webhooks.py
 
 Open a browser.
 
@@ -98,4 +98,4 @@ Start the virtual environment with this terminal command: source bin/activate
 
 Navigate to the spdx-github-master directory
 
-Run this terminal command (replacing the example url with a url for your repository's zip download): python run_scan/download_repo_run_scan.py --url https://github.com/example/example/archive/master.zip
+Run this terminal command (replacing the example url with a url for your repository's zip download): python src/download_repo_run_scan.py --url https://github.com/example/example/archive/master.zip
