@@ -1,9 +1,10 @@
 import unittest
 import sys
 sys.path.append('../src')
-import repo_scan
 from os import path, remove
 import shutil    
+
+import repo_scan
 
 
 #This tests a method that runs through the whole scanning process.

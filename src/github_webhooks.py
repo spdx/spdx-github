@@ -1,6 +1,8 @@
-from flask import Flask, request
-import repo_scan
 import json
+
+from flask import Flask, request
+
+import repo_scan
 
 app = Flask(__name__)
 
