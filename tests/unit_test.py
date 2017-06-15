@@ -2,7 +2,7 @@ import unittest
 import sys
 sys.path.append('../src')
 from os import path, remove
-import shutil    
+import shutil
 
 import repo_scan
 
@@ -46,11 +46,11 @@ class unzipFileTestCase(unittest.TestCase):
     extracted_directory = ''
     def setUp(self):
         self.extracted_directory = repo_scan.unzip_file(self.file_location)
-    
+
     def tearDown(self):
         #Remove the unzipped directory
         shutil.rmtree(self.extracted_directory)
-    
+
     def testUnzip(self):
         assert path.isdir(self.extracted_directory)
 
@@ -65,8 +65,9 @@ class scanTestCase(unittest.TestCase):
         self.spdx_file_name = self.directory[:-1] + '.SPDX'
 
         #scan the extracted directory and put results in a named file
-        repo_scan.scan(self.directory, self.spdx_file_name, 
+        repo_scan.scan(self.directory, self.spdx_file_name,
                                     'scancode', 'tag-value')
+
     def tearDown(self):
         #Remove the scan results file
         remove(self.spdx_file_name)
@@ -79,15 +80,14 @@ class scanTestCase(unittest.TestCase):
 #whether a url results in an error (400 or 500 code)
 class checkURLTestCase(unittest.TestCase):
     good_url = 'https://www.google.com/'
-    bad_url = 'https://www.google.com/fail'   
- 
+    bad_url = 'https://www.google.com/fail'
+
     def testGoodURL(self):
         assert repo_scan.check_valid_url(self.good_url) == True
 
     def testBadURL(self):
-        assert repo_scan.check_valid_url(self.bad_url) == False    
+        assert repo_scan.check_valid_url(self.bad_url) == False
 
 
 if __name__ == "__main__":
     unittest.main()
-    

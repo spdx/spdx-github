@@ -1,4 +1,4 @@
-#This is an example of downloading a repo zip file, 
+#This is an example of downloading a repo zip file,
 #unzipping it and running a scan on it.
 #The example uses scancode, but dosocsv2 could also be used.
 
@@ -14,7 +14,7 @@ import click
 from yaml import safe_load, dump
 
 @click.command()
-@click.option('--url', prompt='The url of the GitHub repo zip file to scan', 
+@click.option('--url', prompt='The url of the GitHub repo zip file to scan',
               help='The url of the GitHub repo zip file to scan.')
 
 def main(url):
@@ -41,14 +41,14 @@ def repo_scan(repo_zip_url):
         spdx_file_name = configuration['output_file_name']
 
     #scan the extracted directory and put results in a named file
-    scan(extracted_directory, spdx_file_name, 'scancode', 
+    scan(extracted_directory, spdx_file_name, 'scancode',
          configuration['output_type'])
 
     #Remove the zip file
     remove(file_location)
     #Remove the unzipped directory
     shutil.rmtree(extracted_directory)
-    
+
     return spdx_file_name
 
 def scan(directory_to_scan, output_file_name, scanner, output_type):
@@ -91,7 +91,7 @@ def download_github_zip(repo_zip_url):
         for chunk in to_scan.iter_content(chunk_size=1024):
             fd.write(chunk)
     #return path to the downloaded file
-    return file_location    
+    return file_location
 
 def get_config(config_file):
     stream = file(config_file, 'r')
