@@ -32,7 +32,7 @@ def repo_scan(repo_zip_url):
     #Extract the zip and get the path of the extracted directory.
     extracted_directory = unzip_file(file_location)
 
-    config_file = extracted_directory + 'configuration.YAML'
+    config_file = extracted_directory + 'configuration.yml'
     configuration = get_config(config_file)
     suffix = configuration['output_file_name'][-5:]
     if(suffix != '.SPDX' and suffix != '.spdx'):
