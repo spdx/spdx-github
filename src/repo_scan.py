@@ -46,8 +46,7 @@ def repo_scan(repo_zip_url):
     #Extract the zip and get the path of the extracted directory.
     extracted_directory = unzip_file(file_location)
 
-    config_file = extracted_directory + 'configuration.yml'
-    configuration = get_config(config_file)
+    configuration = get_config(extracted_directory)
     suffix = configuration['output_file_name'][-5:]
     if(suffix != '.SPDX' and suffix != '.spdx'):
         spdx_file_name = configuration['output_file_name'] + '.SPDX'
@@ -107,9 +106,15 @@ def download_github_zip(repo_zip_url):
     #Return the path to the downloaded file.
     return file_location
 
-def get_config(config_file):
-    stream = file(config_file, 'r')
-    configuration = safe_load(stream)
+def get_config(directory):
+    config_file = directory + 'configuration.yml'
+    if(path.isfile(config_file)):
+        stream = file(config_file, 'r')
+        configuration = safe_load(stream)
+    else:
+        configuration = {}
+        configuration['output_file_name'] = directory[:-1] + '.SPDX'
+	configuration['output_type'] = 'tag-value'
     return configuration
 
 #Check that the url for the zip file can be reached.
