@@ -117,6 +117,7 @@ def get_config(directory):
 	configuration['output_type'] = 'tag-value'
     return configuration
 
+
 #Check that the url for the zip file can be reached.
 def check_valid_url(repo_zip_url):
     #Get just the head.

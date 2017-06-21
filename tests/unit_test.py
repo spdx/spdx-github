@@ -14,11 +14,10 @@
 
 import unittest
 import sys
-sys.path.append('../src')
 from os import path, remove
 import shutil
 
-import repo_scan
+from spdx_github import repo_scan
 
 
 #This tests a method that runs through the whole scanning process.
