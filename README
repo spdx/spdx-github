@@ -34,6 +34,11 @@ Start the virtual environment with this terminal command: source bin/activate
 Install the requests security package with this terminal command: pip install requests[security]
 
 
+### Run the setup script
+
+From the folder for SPDX-GitHub, run 'python setup.py install'
+
+
 The above should get a local instance working.  
 
 
