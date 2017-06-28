@@ -104,5 +104,3 @@ Start the virtual environment with this terminal command: source bin/activate
 Navigate to the spdx-github-master directory
 
 Run this terminal command (replacing the example url with a url for your repository's zip download): python src/repo_scan.py --url https://github.com/example/example/archive/master.zip
-
-test edit
