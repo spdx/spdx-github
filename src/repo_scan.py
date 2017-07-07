@@ -25,7 +25,10 @@ import shutil
 import zipfile
 import sys
 import click
+import json
+import re
 from yaml import safe_load, dump
+from git import Repo, Actor
 
 @click.command()
 @click.option('--url', prompt='The url of the GitHub repo zip file to scan',
@@ -44,23 +47,35 @@ def repo_scan(repo_zip_url):
     #Download the zip and get its path.
     file_location = download_github_zip(repo_zip_url)
     #Extract the zip and get the path of the extracted directory.
-    extracted_directory = unzip_file(file_location)
+    repo_path = unzip_file(file_location)
 
-    configuration = get_config(extracted_directory)
+    configuration = get_config(repo_path, 'configuration.yml')
     suffix = configuration['output_file_name'][-5:]
     if(suffix != '.SPDX' and suffix != '.spdx'):
         spdx_file_name = configuration['output_file_name'] + '.SPDX'
     else:
         spdx_file_name = configuration['output_file_name']
 
+    environment = get_config('./', 'environment.yml')
+    m = re.match(r"https://github.com/(\w+)/(\w+)/",  repo_zip_url)
+    main_repo_user = m.group(1)
+    repo_name = m.group(2)
+
+    repo = Repo.init(repo_path)
+    sync_main_repo(repo_path, main_repo_user, repo_name, repo)
+
+    spdx_file_path = repo_path + spdx_file_name
+
     #Scan the extracted directory and put results in a named file.
-    scan(extracted_directory, spdx_file_name, 'scancode',
+    scan(repo_path, spdx_file_path, 'scancode',
          configuration['output_type'])
+
+    pull_request_to_github(spdx_file_name, repo_path, configuration, main_repo_user, repo_name, environment, repo)
 
     #Remove the zip file.
     remove(file_location)
     #Remove the unzipped directory.
-    shutil.rmtree(extracted_directory)
+    #shutil.rmtree(extracted_directory)
 
     return spdx_file_name
 
@@ -106,8 +121,8 @@ def download_github_zip(repo_zip_url):
     #Return the path to the downloaded file.
     return file_location
 
-def get_config(directory):
-    config_file = directory + 'configuration.yml'
+def get_config(directory, file_name):
+    config_file = directory + file_name
     if(path.isfile(config_file)):
         stream = file(config_file, 'r')
         configuration = safe_load(stream)
@@ -116,6 +131,55 @@ def get_config(directory):
         configuration['output_file_name'] = directory[:-1] + '.SPDX'
 	configuration['output_type'] = 'tag-value'
     return configuration
+
+def sync_main_repo(repo_path, main_repo_user, repo_name, repo):
+    main_repo_url = 'https://www.github.com/' + main_repo_user + '/' + repo_name + '.git'
+    origin = repo.create_remote('origin', main_repo_url)
+    origin.fetch()
+    repo.git.reset('--hard','origin/master')
+
+def pull_request_to_github(file_name, repo_path, configuration, main_repo_user, repo_name, environment, repo):
+  
+    bot_user = environment['username']
+    check_exists_url = 'https://api.github.com/repos/' + bot_user + '/' + repo_name
+    fork_string = main_repo_user + '/' + repo_name
+    ssh_remote = 'git@github.com:' + bot_user + '/' + repo_name
+    pull_request_url = 'https://api.github.com/repos/' + main_repo_user + '/' + repo_name + '/pulls'
+    auth_string = bot_user + ':' + environment['password']
+    pull_request_data = '{"title": "' + environment['pull_request_title'] + '", "head": "' + bot_user + ':master", "base": "master"}'
+
+    index = repo.index
+    path = repo_path + file_name
+
+    index.add([file_name])
+    repo.git.add(file_name) 
+    author = Actor(environment['name'], environment['email'])
+    committer = Actor(environment['name'], environment['email'])
+    commit_message = environment['commit_message']
+    head_commit = str(repo.head.commit)
+    index.commit(commit_message, author=author, committer=committer)
+
+    response = requests.get(check_exists_url)
+    data = response.json()
+    if('message' in data and data['message'] == 'Not Found'):
+        print('Creating fork')
+        print subprocess.check_output(['git', 'hub', 'fork', fork_string])
+    else:
+        print('fork already created')
+
+    repo2 = Repo.init(repo_name + '2')
+    origin = repo2.create_remote('origin', ssh_remote)
+    origin.fetch()
+    origin.pull(origin.refs[0].remote_head)
+    git2 = repo2.git
+    git2.reset('--hard', 'HEAD~2')
+    repo2.git.push('origin', 'HEAD:master', '--force')
+
+    repo.delete_remote(origin)
+    origin = repo.create_remote('origin', ssh_remote)
+    repo.git.push("origin", "HEAD:master")
+
+    print subprocess.check_output(['curl', '--user', auth_string, pull_request_url, '-d', pull_request_data])
 
 
 #Check that the url for the zip file can be reached.

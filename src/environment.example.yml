@@ -1,0 +1,6 @@
+username: bot_username
+password: bot_password
+name: Bot's Name for Commits
+email: bots_email@email.com
+commit_message: SPDX Document Automatic Update
+pull_request_title: SPDX Document Automatic Update
