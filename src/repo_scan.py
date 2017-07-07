@@ -58,8 +58,13 @@ def repo_scan(repo_zip_url):
 
     environment = get_config('./', 'environment.yml')
     m = re.match(r"https://github.com/(\w+)/(\w+)/",  repo_zip_url)
-    main_repo_user = m.group(1)
-    repo_name = m.group(2)
+    if(m):
+        main_repo_user = m.group(1)
+        repo_name = m.group(2)
+    else:
+        m = re.match(r"https://api.github.com/repos/(\w+)/(\w+)/zipball", repo_zip_url)
+        main_repo_user = m.group(1)
+        repo_name = m.group(2)
 
     repo = Repo.init(repo_path)
     sync_main_repo(repo_path, main_repo_user, repo_name, repo)
@@ -67,6 +72,7 @@ def repo_scan(repo_zip_url):
     spdx_file_path = repo_path + spdx_file_name
 
     #Scan the extracted directory and put results in a named file.
+    #TODO: check does existing SPDX file affect the scan? it is in the repository.
     scan(repo_path, spdx_file_path, 'scancode',
          configuration['output_type'])
 
