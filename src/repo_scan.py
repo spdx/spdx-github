@@ -58,7 +58,7 @@ def repo_scan(repo_zip_url):
         spdx_file_name = configuration['output_file_name']
 
     environment = get_config('./', 'environment.yml')
-    m = re.match(r"https://github.com/(\w+)/(\w+)/",  repo_zip_url)
+    m = re.match(r"https://github.com/(\w+)/(\w+)/", repo_zip_url)
     if(m):
         main_repo_user = m.group(1)
         repo_name = m.group(2)
@@ -77,7 +77,7 @@ def repo_scan(repo_zip_url):
     scan(repo_path, spdx_file_path, 'scancode',
          configuration['output_type'])
 
-    pull_request_to_github(spdx_file_name, repo_path, configuration, 
+    pull_request_to_github(spdx_file_name, repo_path, configuration,
                            main_repo_user, repo_name, environment, repo)
 
     #Remove the zip file.
@@ -93,7 +93,7 @@ def scan(directory_to_scan, output_file_name, scanner, output_type):
     elif(output_type == 'rdf'):
         output_format = 'spdx-rdf'
     #Scan the unzipped directory.
-    print subprocess.check_output(['scancode','--format', 
+    print subprocess.check_output(['scancode','--format',
                                   output_format,directory_to_scan,
                                   output_file_name])
 
@@ -147,26 +147,26 @@ def sync_main_repo(repo_path, main_repo_user, repo_name, repo):
     origin.fetch()
     repo.git.reset('--hard','origin/master')
 
-def pull_request_to_github(file_name, repo_path, configuration, main_repo_user, 
+def pull_request_to_github(file_name, repo_path, configuration, main_repo_user,
                            repo_name, environment, repo):
-  
+
     bot_user = environment['username']
     check_exists_url = ('https://api.github.com/repos/' + bot_user + '/'
                         + repo_name)
     fork_string = main_repo_user + '/' + repo_name
     ssh_remote = 'git@github.com:' + bot_user + '/' + repo_name
-    pull_request_url = ('https://api.github.com/repos/' + main_repo_user + '/' 
+    pull_request_url = ('https://api.github.com/repos/' + main_repo_user + '/'
                         + repo_name + '/pulls')
     auth_string = bot_user + ':' + environment['password']
-    pull_request_data = ('{"title": "' + environment['pull_request_title'] 
-                         + '", "head": "' + bot_user 
+    pull_request_data = ('{"title": "' + environment['pull_request_title']
+                         + '", "head": "' + bot_user
                          + ':master", "base": "master"}')
 
     index = repo.index
     path = repo_path + file_name
 
     index.add([file_name])
-    repo.git.add(file_name) 
+    repo.git.add(file_name)
     author = Actor(environment['name'], environment['email'])
     committer = Actor(environment['name'], environment['email'])
     commit_message = environment['commit_message']
@@ -193,7 +193,7 @@ def pull_request_to_github(file_name, repo_path, configuration, main_repo_user,
     origin = repo.create_remote('origin', ssh_remote)
     repo.git.push("origin", "HEAD:master")
 
-    print subprocess.check_output(['curl', '--user', auth_string, 
+    print subprocess.check_output(['curl', '--user', auth_string,
                                   pull_request_url, '-d', pull_request_data])
 
 
@@ -205,7 +205,7 @@ def check_valid_url(repo_zip_url):
     #Otherwise, inform the user of failure.
     if (request.status_code >= 400 or request.status_code < 200):
         print('Could not reach URL provided.\n')
-        print('Provided url was ' + repo_zip_url 
+        print('Provided url was ' + repo_zip_url
               + ' and resulted in status code ' + str(request.status_code))
         return False
     else:
