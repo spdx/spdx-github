@@ -33,13 +33,19 @@ Start the virtual environment with this terminal command: source bin/activate
 
 Install the requests security package with this terminal command: pip install requests[security]
 
+Install the hub package with this terminal command: pip install hub
+
 
 ### Run the setup script
 
 From the folder for SPDX-GitHub, run 'python setup.py install'
 
 
-The above should get a local instance working.  
+The above should get a local instance working. 
+
+### Set up SSH
+
+SPDX-GitHub will create a pull request with the new SPDX document.  In order to do this, it needs to be able to access a GitHub account on which it can fork the repository.  It is intended that this account will be a second, bot account and not an account with any access or commit rights to the main repository.  The bot user will need SSH authentication for GitHub set up in order to work with its fork of the repository.  Instructions on setting up SSH:  https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
 
 
 ## Further installation instructions if the user would like to use webhooks:
@@ -48,15 +54,9 @@ Firstly, in order to use webhooks, you must be an administrator of the repositor
 
 Also, please note that these instructions and the current code do not yet include security for webhooks.  To see instructions for webhook security, go to this web page:  https://developer.github.com/webhooks/securing/
 
-Any server that can expose SPDX-GitHub to the internet will work, but these instructions will use ngrok.
+A server that will expose SPDX-GitHub to the internet is needed.  These instructions assume that the user will want to use a server of their choice and thus do not include instructions for setting up the web server.
 
-Download ngrok from this link https://ngrok.com/download
-
-Unzip ngrok.  Example terminal command: unzip ngrok-stable-linux-amd64.zip
-
-From the directory containing ngrok, run this terminal command: ./ngrok http 5000
-
-Open a second terminal window.
+Open a terminal window.
 
 Start the ScanCode virtual environment:
 
@@ -68,7 +68,7 @@ install Flask using this command: pip install Flask
 
 Navigate to the spdx-github-master directory (where you unzipped SPDX-GitHub earlier).
 
-Run the following terminal command: python src/github_webhooks.py
+Run the following terminal command: python src/github_webhooks.py.  This starts the code that will wait for a webhook.
 
 Open a browser.
 
@@ -78,19 +78,15 @@ Click the settings tab, then the Webhooks tab.
 
 Click "Add webhook"
 
-Navigate to the terminal window in which you earlier started ngrok.
-You will see a line that looks like this, with a slightly different url:
-https://12345a6b.ngrok.io -> localhost:5000
-
-Copy the url, and paste it into the GitHub Webhooks page in the "Payload URL" field.
+Copy the url of your server running github_webhooks.py, and paste it into the GitHub Webhooks page in the "Payload URL" field.
 
 Directly underneath this is the content type field.  Select "application/json"
 
-Right now only push events are supported.  Leave the event selection on "Just the push event"
+Right now push and release events are supported.  Select either only pushes, only releases, or both pushes and releases.
 
 Click "Add webhook"
 
-You are now set up to run a new scan whenever a new push is made to your repository.
+You are now set up to run a new scan whenever a new push or release is made to your repository.
 
 
 ## Useage (without webhooks):
