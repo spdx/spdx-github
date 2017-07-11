@@ -42,7 +42,8 @@ def main(url):
         sys.exit()
     repo_scan(repo_zip_url)
 
-#This method goes throught the overall process of downloading and scanning a repo.
+#This method goes throught the overall process 
+#of downloading and scanning a repo.
 def repo_scan(repo_zip_url):
     #Download the zip and get its path.
     file_location = download_github_zip(repo_zip_url)
@@ -70,7 +71,8 @@ def repo_scan(repo_zip_url):
     scan(repo_path, spdx_file_path, 'scancode',
          configuration['output_type'])
 
-    pull_request_to_github(spdx_file_name, repo_path, configuration, main_repo_user, repo_name, environment, repo)
+    pull_request_to_github(spdx_file_name, repo_path, configuration, 
+                           main_repo_user, repo_name, environment, repo)
 
     #Remove the zip file.
     remove(file_location)
@@ -133,20 +135,26 @@ def get_config(directory, file_name):
     return configuration
 
 def sync_main_repo(repo_path, main_repo_user, repo_name, repo):
-    main_repo_url = 'https://www.github.com/' + main_repo_user + '/' + repo_name + '.git'
+    main_repo_url = ('https://www.github.com/' + main_repo_user + '/'
+                     + repo_name + '.git')
     origin = repo.create_remote('origin', main_repo_url)
     origin.fetch()
     repo.git.reset('--hard','origin/master')
 
-def pull_request_to_github(file_name, repo_path, configuration, main_repo_user, repo_name, environment, repo):
+def pull_request_to_github(file_name, repo_path, configuration, main_repo_user, 
+                           repo_name, environment, repo):
   
     bot_user = environment['username']
-    check_exists_url = 'https://api.github.com/repos/' + bot_user + '/' + repo_name
+    check_exists_url = ('https://api.github.com/repos/' + bot_user + '/'
+                        + repo_name)
     fork_string = main_repo_user + '/' + repo_name
     ssh_remote = 'git@github.com:' + bot_user + '/' + repo_name
-    pull_request_url = 'https://api.github.com/repos/' + main_repo_user + '/' + repo_name + '/pulls'
+    pull_request_url = ('https://api.github.com/repos/' + main_repo_user + '/' 
+                        + repo_name + '/pulls')
     auth_string = bot_user + ':' + environment['password']
-    pull_request_data = '{"title": "' + environment['pull_request_title'] + '", "head": "' + bot_user + ':master", "base": "master"}'
+    pull_request_data = ('{"title": "' + environment['pull_request_title'] 
+                         + '", "head": "' + bot_user 
+                         + ':master", "base": "master"}')
 
     index = repo.index
     path = repo_path + file_name
@@ -179,7 +187,8 @@ def pull_request_to_github(file_name, repo_path, configuration, main_repo_user, 
     origin = repo.create_remote('origin', ssh_remote)
     repo.git.push("origin", "HEAD:master")
 
-    print subprocess.check_output(['curl', '--user', auth_string, pull_request_url, '-d', pull_request_data])
+    print subprocess.check_output(['curl', '--user', auth_string, 
+                                  pull_request_url, '-d', pull_request_data])
 
 
 #Check that the url for the zip file can be reached.
