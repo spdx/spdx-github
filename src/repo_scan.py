@@ -58,7 +58,7 @@ def repo_scan(repo_zip_url):
     #with the spdx extension. If not, add it.
     suffix = configuration['output_file_name'][-5:]
     if(suffix != '.SPDX' and suffix != '.spdx'):
-        spdx_file_name = configuration['output_file_name'] + '.SPDX'
+        spdx_file_name = configuration['output_file_name'] + '.spdx'
     else:
         spdx_file_name = configuration['output_file_name']
 
