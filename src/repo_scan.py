@@ -102,7 +102,7 @@ def repo_scan(repo_zip_url):
     #Remove the zip file.
     remove(file_location)
     #Remove the unzipped directory.
-    #shutil.rmtree(extracted_directory)
+    shutil.rmtree(repo_path)
 
     return spdx_file_name
 
@@ -251,6 +251,7 @@ def pull_request_to_github(file_name, repo_path, configuration, main_repo_user,
     git2 = repo2.git
     git2.reset('--hard', 'HEAD~2')
     repo2.git.push('origin', 'HEAD:master', '--force')
+    shutil.rmtree(repo_name + '2')
 
     #The local repository's remote is the main repository.
     #Change its remote to the fork of the main repository,
