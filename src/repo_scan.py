@@ -94,10 +94,15 @@ def repo_scan(repo_zip_url):
     scan(repo_path, spdx_file_path, 'scancode',
          configuration['output_type'])
 
-    #Now that the new spdx file is created, make a pull request to
-    #GitHub with it.
-    pull_request_to_github(spdx_file_name, repo_path, configuration,
-                           main_repo_user, repo_name, environment, repo)
+    commit_file(spdx_file_name, repo, environment)
+
+    create_fork(repo_name, main_repo_user, environment)
+
+    undo_recent_commits(repo_name, environment)
+
+    push_to_remote(repo, repo_name, environment)
+
+    pull_request_to_github(main_repo_user, repo_name, environment)
 
     #Remove the zip file.
     remove(file_location)
@@ -175,43 +180,33 @@ def sync_main_repo(repo_path, main_repo_user, repo_name, repo):
     origin = repo.create_remote('origin', main_repo_url)
     origin.fetch()
     repo.git.reset('--hard','origin/master')
+    repo.delete_remote(origin)
 
 #Make a pull request to GitHub with the new SPDX file.
-def pull_request_to_github(file_name, repo_path, configuration, main_repo_user,
-                           repo_name, environment, repo):
+def pull_request_to_github(main_repo_user, repo_name, environment):
 
     #Creating strings, mainly URLs, that will be needed for the
     #pull request process.
 
-    #The username in the environment file is for an extra user
-    #who does not have permissions to the main repository
-    bot_user = environment['username']
-    #The bot user will create a fork of the repository, but first we
-    #must check if the bot user already has a fork of the repository.
-    #This URL is used for that.
-    check_exists_url = ('https://api.github.com/repos/' + bot_user + '/'
-                        + repo_name)
-    #This is the username/repo for the main repo we will be forking
-    fork_string = main_repo_user + '/' + repo_name
-    #This is to access the bot user's forked repo using SSH
-    ssh_remote = 'git@github.com:' + bot_user + '/' + repo_name
     #This is the API URL to make a pull request
     pull_request_url = ('https://api.github.com/repos/' + main_repo_user + '/'
                         + repo_name + '/pulls')
     #This has the username and password from the environment file.
     #It is used to log in for API calls.
-    auth_string = bot_user + ':' + environment['password']
+    auth_string = environment['username'] + ':' + environment['password']
     #This is the data that will be posted for the pull request.
     #It tells the API what the pull request will be like.
     pull_request_data = ('{"title": "' + environment['pull_request_title']
-                         + '", "head": "' + bot_user
+                         + '", "head": "' + environment['username']
                          + ':master", "base": "master"}')
 
+    #Make the pull request to the main repository
+    print subprocess.check_output(['curl', '--user', auth_string,
+                                  pull_request_url, '-d', pull_request_data])
+
+def commit_file(file_name, repo, environment):
     #The index of the repo is used to add the spdx file to be committed.
     index = repo.index
-    #This is the local path to the SPDX file.
-    path = repo_path + file_name
-
     #Add the SPDX file to be committed
     index.add([file_name])
     repo.git.add(file_name)
@@ -224,6 +219,14 @@ def pull_request_to_github(file_name, repo_path, configuration, main_repo_user,
     #Make the commit locally of the new SPDX file
     index.commit(commit_message, author=author, committer=committer)
 
+def create_fork(repo_name, main_repo_user, environment):
+    #The bot user will create a fork of the repository, but first we
+    #must check if the bot user already has a fork of the repository.
+    #This URL is used for that.
+    check_exists_url = ('https://api.github.com/repos/' + environment['username']
+                        + '/' + repo_name)
+    #This is the username/repo for the main repo we will be forking
+    fork_string = main_repo_user + '/' + repo_name
     #Check whether the remote fork of this repository exists.
     #If it doesn't exist, create a new fork for the bot user.
     response = requests.get(check_exists_url)
@@ -233,6 +236,11 @@ def pull_request_to_github(file_name, repo_path, configuration, main_repo_user,
         print subprocess.check_output(['git', 'hub', 'fork', fork_string])
     else:
         print('fork already created')
+
+def undo_recent_commits(repo_name, environment):
+    #This is to access the bot user's forked repo using SSH
+    ssh_remote = ('git@github.com:' + environment['username'] 
+                  + '/' + repo_name)
 
     #The remote fork may already have an SPDX document that was
     #not pulled yet by the main repository.  
@@ -253,17 +261,16 @@ def pull_request_to_github(file_name, repo_path, configuration, main_repo_user,
     repo2.git.push('origin', 'HEAD:master', '--force')
     shutil.rmtree(repo_name + '2')
 
+def push_to_remote(repo, repo_name, environment):
+    #This is to access the bot user's forked repo using SSH
+    ssh_remote = ('git@github.com:' + environment['username'] 
+                  + '/' + repo_name)
+
     #The local repository's remote is the main repository.
     #Change its remote to the fork of the main repository,
     #and then push the new SPDX commit
-    repo.delete_remote(origin)
     origin = repo.create_remote('origin', ssh_remote)
     repo.git.push("origin", "HEAD:master")
-
-    #Make the pull request to the main repository
-    print subprocess.check_output(['curl', '--user', auth_string,
-                                  pull_request_url, '-d', pull_request_data])
-
 
 #Check that the url for the zip file can be reached.
 def check_valid_url(repo_zip_url):
