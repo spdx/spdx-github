@@ -93,7 +93,6 @@ def repo_scan(repo_zip_url):
     spdx_file_path = repo_path + spdx_file_name
 
     #Scan the extracted directory and put results in a named file.
-    #TODO: check does existing SPDX file affect the scan? it is in the repository.
     scan(repo_path, spdx_file_path, 'scancode',
          configuration['output_type'])
 
@@ -165,17 +164,17 @@ def download_github_zip(repo_zip_url):
 #Its name is file_name.  Convert it to a dictionary
 #and return it.  If the file is not found, create
 #some default options for it.
-#TODO: the default options are for configuration.yml and
-#won't work for environment.yml
 def get_config_yml(directory, file_name):
     config_file = directory + file_name
     if(path.isfile(config_file)):
         stream = file(config_file, 'r')
         configuration = safe_load(stream)
-    else:
+    elif(file_name == 'configuration.yml'):
         configuration = {}
         configuration['output_file_name'] = directory[:-1] + '.SPDX'
 	configuration['output_type'] = 'tag-value'
+    else:
+        configuration = {}
     return configuration
 
 #Sync up a local repo with its remote repository.
