@@ -40,13 +40,19 @@ Install the hub package with this terminal command: pip install hub
 
 From the folder for SPDX-GitHub, run 'python setup.py install'
 
+### Modify the environment.yml file
 
-The above should get a local instance working. 
+The environment.yml file contains information that will be used to make a pull request.  The pull request is made by a second, bot account without any access to the repository to be scanned.  Edit the values in environment.yml to match what you would like, for example, the title of the pull request and the username of the bot user.  The environment file is intended only for local use, not to be placed on the main repository.
+
+### Modify the configuration.yml file
+
+The configuration.yml file is stored in the main repository.  It provides options on how the scan will be run, for example, the name of the output SPDX document.  Modify this file to match the options you would like.
 
 ### Set up SSH
 
 SPDX-GitHub will create a pull request with the new SPDX document.  In order to do this, it needs to be able to access a GitHub account on which it can fork the repository.  It is intended that this account will be a second, bot account and not an account with any access or commit rights to the main repository.  The bot user will need SSH authentication for GitHub set up in order to work with its fork of the repository.  Instructions on setting up SSH:  https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/
 
+The above should get a local instance working. 
 
 ## Further installation instructions if the user would like to use webhooks:
 
