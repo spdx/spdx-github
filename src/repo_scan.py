@@ -30,8 +30,7 @@ import re
 from yaml import safe_load, dump
 from git import Repo, Actor
 import smtplib
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEText import MIMEText
+from email.mime.text import MIMEText
 
 @click.command()
 @click.option('--url', prompt='The url of the GitHub repo zip file to scan',
@@ -297,8 +296,11 @@ def send_email(environment):
     server.starttls()
     server.login(environment['gmail_email'], environment['gmail_password'])
  
-    msg = environment['notification_message']
-    server.sendmail(environment['gmail_email'], environment['notification_email'], msg)
+    msg = msg = MIMEText(environment['notification_message'])
+    msg['Subject'] = environment['notification_subject']
+    msg['From'] = environment['gmail_email']
+    msg['To'] = environment['notification_email']
+    server.sendmail(environment['gmail_email'], environment['notification_email'], msg.as_string())
     server.quit()
 
 if __name__ == "__main__": main()
