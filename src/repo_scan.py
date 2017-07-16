@@ -111,7 +111,8 @@ def repo_scan(repo_zip_url):
     #Remove the unzipped directory.
     shutil.rmtree(repo_path)
 
-    send_email(environment)
+    if(environment['send_notification_email']):
+        send_email(environment)
 
     return spdx_file_name
 

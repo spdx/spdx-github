@@ -42,7 +42,7 @@ From the folder for SPDX-GitHub, run 'python setup.py install'
 
 ### Modify the environment.yml file
 
-The environment.yml file contains information that will be used to make a pull request.  The pull request is made by a second, bot account without any access to the repository to be scanned.  Edit the values in environment.yml to match what you would like, for example, the title of the pull request and the username of the bot user.  It also requires a gmail email and password to send a notification email from and an email on which you would like to receive notificaion of a new spdx document.  The environment file is intended only for local use, not to be placed on the main repository.
+The environment.yml file contains information that will be used to make a pull request.  The pull request is made by a second, bot account without any access to the repository to be scanned.  Edit the values in environment.yml to match what you would like, for example, the title of the pull request and the username of the bot user.  If you would like to be sent an email notification when the SPDX document is ready, it also requires a gmail email and password to send a notification email from and an email on which you would like to receive notificaion of a new spdx document.  If you would not like email notifications, change send_notification_email to False.  The environment file is intended only for local use, not to be placed on the main repository.
 
 ### Modify the configuration.yml file
 

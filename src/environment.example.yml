@@ -9,3 +9,4 @@ gmail_password: bot_email_password
 notification_email: email_to_notify@email.com
 notification_subject: New SPDX Document Ready
 notification_message: Your new SPDX document is ready.
+send_notification_email: True
