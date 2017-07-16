@@ -53,7 +53,7 @@ def repo_scan(repo_zip_url):
     #The configuration.yml file is stored with the repo.
     #get_config returns us a dictionary based on this file
     #with the configuration options.
-    configuration = get_config(repo_path, 'configuration.yml')
+    configuration = get_config_yml(repo_path, 'configuration.yml')
     #Check that the configuration file's output file name ends
     #with the spdx extension. If not, add it.
     suffix = configuration['output_file_name'][-5:]
@@ -61,12 +61,20 @@ def repo_scan(repo_zip_url):
         spdx_file_name = configuration['output_file_name'] + '.spdx'
     else:
         spdx_file_name = configuration['output_file_name']
+	
+    if(path.isfile('./environment.yml')):
+        print("\nIS FILE\n")
+    else:
+        print("\nIS NOT FILE\n")
 
     #The environment.yml file is stored locally because it includes
     #authentication information.  get_config gets us a
     #dictionary with the options.
-    environment = get_config('./', 'environment.yml')
+    environment = get_config_yml('./', 'environment.yml')
 
+    for key, value in environment.iteritems():
+        print (key + " " + value + "\n")
+    #exit()
     #We have the zip file url.  We will need other urls related to
     #the repo in order to make a pull request.  To do this, we first
     #get the username and repo name from the zip url using a regex.
@@ -162,7 +170,7 @@ def download_github_zip(repo_zip_url):
 #some default options for it.
 #TODO: the default options are for configuration.yml and
 #won't work for environment.yml
-def get_config(directory, file_name):
+def get_config_yml(directory, file_name):
     config_file = directory + file_name
     if(path.isfile(config_file)):
         stream = file(config_file, 'r')

@@ -16,24 +16,12 @@ import unittest
 import sys
 from os import path, remove
 import shutil
+import re
+import subprocess
+
+from git import Repo
 
 from spdx_github import repo_scan
-
-
-#This tests a method that runs through the whole scanning process.
-#Since it calls a few other methods, it will fail also if those methods fail.
-class WholeScanTestCase(unittest.TestCase):
-    url = 'https://github.com/abuhman/test_webhooks/archive/master.zip'
-    spdx_file_name = ''
-
-    def setUp(self):
-        self.spdx_file_name = repo_scan.repo_scan(self.url)
-
-    def tearDown(self):
-        remove(self.spdx_file_name)
-
-    def testWholeScan(self):
-        assert path.isfile(self.spdx_file_name)
 
 
 #Test that when given a valid zip file url,
@@ -100,6 +88,62 @@ class CheckURLTestCase(unittest.TestCase):
 
     def testBadURL(self):
         assert repo_scan.check_valid_url(self.bad_url) == False
+
+class GetConfigTestCase(unittest.TestCase):
+    from spdx_github import repo_scan
+    configExisting = repo_scan.get_config_yml('./', 'test.yml')
+    configNotExisting = repo_scan.get_config_yml('test/', 'test.yml')
+
+    def testExistingConfig(self):
+        assert self.configExisting['output_file_name'] == 'file_name.SPDX'
+        assert self.configExisting['output_type'] == 'rdf'
+
+    def testNotExistingConfig(self):
+        assert self.configNotExisting['output_file_name'] == 'test.SPDX'
+        assert self.configNotExisting['output_type'] == 'tag-value'
+
+class SyncRepoTestCase(unittest.TestCase):
+    repo_path = './test_repo'
+    main_repo_user = 'abuhman'
+    repo_name = 'test_webhooks'
+    repo = Repo.init(repo_path)
+    repo_scan.sync_main_repo(repo_path, main_repo_user, repo_name, repo)
+
+    main_repo_url = ('https://www.github.com/' + main_repo_user + '/'
+                     + repo_name + '.git')
+    origin = repo.create_remote('origin', main_repo_url)
+    repo.git.fetch()
+    output_string = repo.git.diff('origin/master')
+    repo.delete_remote(origin)
+
+    def testRepoSynced(self):
+        assert self.output_string == ""
+
+class MakeCommitTestCase(unittest.TestCase):
+    file_name = 'test.yml'
+    subprocess.check_output(['cp', file_name, './test_repo'])
+    repo = Repo.init('./test_repo')
+    environment = {}
+    environment['name'] = 'TEST_NAME'
+    environment['email'] = 'TEST_EMAIL'
+    environment['commit_message'] = 'TEST_MSG'
+    repo_scan.commit_file(file_name, repo, environment)
+
+    headcommit = repo.head.commit
+
+    def tearDown(self):
+        main_repo_user = 'abuhman'
+        repo_name = 'test_webhooks'
+        main_repo_url = ('https://www.github.com/' + main_repo_user + '/'
+                         + repo_name + '.git')
+
+        origin = self.repo.create_remote('origin', main_repo_url)
+        origin.fetch()
+        self.repo.git.reset('--hard','origin/master')
+
+    def testCommitMade(self):
+        assert self.headcommit.author.name == 'TEST_NAME'
+
 
 
 if __name__ == "__main__":
