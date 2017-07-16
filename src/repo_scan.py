@@ -29,6 +29,9 @@ import json
 import re
 from yaml import safe_load, dump
 from git import Repo, Actor
+import smtplib
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
 
 @click.command()
 @click.option('--url', prompt='The url of the GitHub repo zip file to scan',
@@ -61,19 +64,12 @@ def repo_scan(repo_zip_url):
         spdx_file_name = configuration['output_file_name'] + '.spdx'
     else:
         spdx_file_name = configuration['output_file_name']
-	
-    if(path.isfile('./environment.yml')):
-        print("\nIS FILE\n")
-    else:
-        print("\nIS NOT FILE\n")
 
     #The environment.yml file is stored locally because it includes
     #authentication information.  get_config gets us a
     #dictionary with the options.
     environment = get_config_yml('./', 'environment.yml')
 
-    for key, value in environment.iteritems():
-        print (key + " " + value + "\n")
     #exit()
     #We have the zip file url.  We will need other urls related to
     #the repo in order to make a pull request.  To do this, we first
@@ -116,6 +112,8 @@ def repo_scan(repo_zip_url):
     remove(file_location)
     #Remove the unzipped directory.
     shutil.rmtree(repo_path)
+
+    send_email(environment)
 
     return spdx_file_name
 
@@ -201,11 +199,11 @@ def pull_request_to_github(main_repo_user, repo_name, environment):
                         + repo_name + '/pulls')
     #This has the username and password from the environment file.
     #It is used to log in for API calls.
-    auth_string = environment['username'] + ':' + environment['password']
+    auth_string = environment['github_username'] + ':' + environment['github_password']
     #This is the data that will be posted for the pull request.
     #It tells the API what the pull request will be like.
-    pull_request_data = ('{"title": "' + environment['pull_request_title']
-                         + '", "head": "' + environment['username']
+    pull_request_data = ('{"title": "' + environment['github_pull_request_title']
+                         + '", "head": "' + environment['github_username']
                          + ':master", "base": "master"}')
 
     #Make the pull request to the main repository
@@ -219,9 +217,9 @@ def commit_file(file_name, repo, environment):
     index.add([file_name])
     repo.git.add(file_name)
     #Set the author, committer, and commit message.
-    author = Actor(environment['name'], environment['email'])
-    committer = Actor(environment['name'], environment['email'])
-    commit_message = environment['commit_message']
+    author = Actor(environment['git_name'], environment['git_email'])
+    committer = Actor(environment['git_name'], environment['git_email'])
+    commit_message = environment['git_commit_message']
     #Get the head commit
     head_commit = str(repo.head.commit)
     #Make the commit locally of the new SPDX file
@@ -231,7 +229,7 @@ def create_fork(repo_name, main_repo_user, environment):
     #The bot user will create a fork of the repository, but first we
     #must check if the bot user already has a fork of the repository.
     #This URL is used for that.
-    check_exists_url = ('https://api.github.com/repos/' + environment['username']
+    check_exists_url = ('https://api.github.com/repos/' + environment['github_username']
                         + '/' + repo_name)
     #This is the username/repo for the main repo we will be forking
     fork_string = main_repo_user + '/' + repo_name
@@ -247,7 +245,7 @@ def create_fork(repo_name, main_repo_user, environment):
 
 def undo_recent_commits(repo_name, environment):
     #This is to access the bot user's forked repo using SSH
-    ssh_remote = ('git@github.com:' + environment['username'] 
+    ssh_remote = ('git@github.com:' + environment['github_username'] 
                   + '/' + repo_name)
 
     #The remote fork may already have an SPDX document that was
@@ -271,7 +269,7 @@ def undo_recent_commits(repo_name, environment):
 
 def push_to_remote(repo, repo_name, environment):
     #This is to access the bot user's forked repo using SSH
-    ssh_remote = ('git@github.com:' + environment['username'] 
+    ssh_remote = ('git@github.com:' + environment['github_username'] 
                   + '/' + repo_name)
 
     #The local repository's remote is the main repository.
@@ -293,5 +291,14 @@ def check_valid_url(repo_zip_url):
         return False
     else:
         return True
+
+def send_email(environment):
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login(environment['gmail_email'], environment['gmail_password'])
+ 
+    msg = environment['notification_message']
+    server.sendmail(environment['gmail_email'], environment['notification_email'], msg)
+    server.quit()
 
 if __name__ == "__main__": main()
