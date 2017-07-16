@@ -89,22 +89,22 @@ def repo_scan(repo_zip_url):
     repo = Repo.init(repo_path)
     sync_main_repo(repo_path, main_repo_user, repo_name, repo)
 
-    #This is the path to the spdx file stored locally
-    spdx_file_path = repo_path + spdx_file_name
+    if(environment['send_pull_request']):
+        #This is the path to the spdx file stored locally
+        spdx_file_path = repo_path + spdx_file_name
+    else:
+        spdx_file_path = environment['local_spdx_path'] + spdx_file_name
 
     #Scan the extracted directory and put results in a named file.
     scan(repo_path, spdx_file_path, 'scancode',
          configuration['output_type'])
 
-    commit_file(spdx_file_name, repo, environment)
-
-    create_fork(repo_name, main_repo_user, environment)
-
-    undo_recent_commits(repo_name, environment)
-
-    push_to_remote(repo, repo_name, environment)
-
-    pull_request_to_github(main_repo_user, repo_name, environment)
+    if(environment['send_pull_request']):
+        commit_file(spdx_file_name, repo, environment)
+        create_fork(repo_name, main_repo_user, environment)
+        undo_recent_commits(repo_name, environment)
+        push_to_remote(repo, repo_name, environment)
+        pull_request_to_github(main_repo_user, repo_name, environment)
 
     #Remove the zip file.
     remove(file_location)
