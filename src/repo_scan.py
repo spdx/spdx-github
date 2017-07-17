@@ -311,7 +311,6 @@ def find_file_location(directory, file_name):
     #https://stackoverflow.com/questions/2186525/use-a-glob-to-find-files-recursively-in-python
     for root, dirnames, filenames in os.walk(directory):
         for filename in fnmatch.filter(filenames, file_name):
-            matches = os.path.join(root, filename)
             file_directory = root
     if(file_directory[-1:] != '/'):
         file_directory = file_directory + '/'
