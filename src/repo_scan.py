@@ -31,6 +31,7 @@ from yaml import safe_load, dump
 from git import Repo, Actor
 import smtplib
 from email.mime.text import MIMEText
+import fnmatch
 
 @click.command()
 @click.option('--url', prompt='The url of the GitHub repo zip file to scan',
@@ -47,6 +48,7 @@ def main(url):
 #This method goes throught the overall process 
 #of downloading and scanning a repo.
 def repo_scan(repo_zip_url):
+
     #Download the zip and get its path.
     file_location = download_github_zip(repo_zip_url)
     #Extract the zip and get the path of the extracted directory.
@@ -55,7 +57,8 @@ def repo_scan(repo_zip_url):
     #The configuration.yml file is stored with the repo.
     #get_config returns us a dictionary based on this file
     #with the configuration options.
-    configuration = get_config_yml(repo_path, 'configuration.yml')
+    config_path = find_file_location(repo_path, 'configuration.yml')
+    configuration = get_config_yml(config_path, 'configuration.yml')
     #Check that the configuration file's output file name ends
     #with the spdx extension. If not, add it.
     suffix = configuration['output_file_name'][-5:]
@@ -67,7 +70,8 @@ def repo_scan(repo_zip_url):
     #The environment.yml file is stored locally because it includes
     #authentication information.  get_config gets us a
     #dictionary with the options.
-    environment = get_config_yml('./', 'environment.yml')
+    env_path = find_file_location('../', 'environment.yml')
+    environment = get_config_yml(env_path, 'environment.yml')
 
     #exit()
     #We have the zip file url.  We will need other urls related to
@@ -302,5 +306,15 @@ def send_email(environment):
     msg['To'] = environment['notification_email']
     server.sendmail(environment['gmail_email'], environment['notification_email'], msg.as_string())
     server.quit()
+
+def find_file_location(directory, file_name):
+    #https://stackoverflow.com/questions/2186525/use-a-glob-to-find-files-recursively-in-python
+    for root, dirnames, filenames in os.walk(directory):
+        for filename in fnmatch.filter(filenames, file_name):
+            matches = os.path.join(root, filename)
+            file_directory = root
+    if(file_directory[-1:] != '/'):
+        file_directory = file_directory + '/'
+    return file_directory
 
 if __name__ == "__main__": main()
