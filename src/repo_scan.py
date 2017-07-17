@@ -308,6 +308,7 @@ def send_email(environment):
     server.quit()
 
 def find_file_location(directory, file_name):
+    file_directory = directory
     #https://stackoverflow.com/questions/2186525/use-a-glob-to-find-files-recursively-in-python
     for root, dirnames, filenames in os.walk(directory):
         for filename in fnmatch.filter(filenames, file_name):
