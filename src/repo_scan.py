@@ -47,7 +47,7 @@ def main(url, False):
 
 #This method goes throught the overall process 
 #of downloading and scanning a repo.
-def repo_scan(repo_zip_url, remote):
+def repo_scan(repo_zip_url, remote, task_id = 0):
 
     #Download the zip and get its path.
     file_location = download_github_zip(repo_zip_url)
@@ -61,11 +61,14 @@ def repo_scan(repo_zip_url, remote):
     configuration = get_config_yml(config_path, 'configuration.yml')
     #Check that the configuration file's output file name ends
     #with the spdx extension. If not, add it.
-    suffix = configuration['output_file_name'][-5:]
-    if(suffix != '.SPDX' and suffix != '.spdx'):
-        spdx_file_name = configuration['output_file_name'] + '.spdx'
+    if(remote):
+        spdx_file_name = task_id + '.spdx'
     else:
-        spdx_file_name = configuration['output_file_name']
+        suffix = configuration['output_file_name'][-5:]
+        if(suffix != '.SPDX' and suffix != '.spdx'):
+            spdx_file_name = configuration['output_file_name'] + '.spdx'
+        else:
+            spdx_file_name = configuration['output_file_name']
 
     #The environment.yml file is stored locally because it includes
     #authentication information.  get_config gets us a
