@@ -37,7 +37,7 @@ import fnmatch
 @click.option('--url', prompt='The url of the GitHub repo zip file to scan',
               help='The url of the GitHub repo zip file to scan.')
 
-def main(url):
+def main(url, False):
     #The argument is the url of the GitHub zip file
     repo_zip_url = url
     #If the url gives an error, exit
@@ -47,7 +47,7 @@ def main(url):
 
 #This method goes throught the overall process 
 #of downloading and scanning a repo.
-def repo_scan(repo_zip_url):
+def repo_scan(repo_zip_url, remote):
 
     #Download the zip and get its path.
     file_location = download_github_zip(repo_zip_url)
@@ -93,7 +93,9 @@ def repo_scan(repo_zip_url):
     repo = Repo.init(repo_path)
     sync_main_repo(repo_path, main_repo_user, repo_name, repo)
 
-    if(environment['send_pull_request']):
+    if(remote):
+        spdx_file_path = './file_server/' + spdx_file_name
+    elif(environment['send_pull_request']):
         #This is the path to the spdx file stored locally
         spdx_file_path = repo_path + spdx_file_name
     else:
@@ -103,7 +105,7 @@ def repo_scan(repo_zip_url):
     scan(repo_path, spdx_file_path, 'scancode',
          configuration['output_type'])
 
-    if(environment['send_pull_request']):
+    if(environment['send_pull_request'] and not(remote)):
         commit_file(spdx_file_name, repo, environment)
         create_fork(repo_name, main_repo_user, environment)
         undo_recent_commits(repo_name, environment)
