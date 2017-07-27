@@ -32,22 +32,64 @@ from git import Repo, Actor
 import smtplib
 from email.mime.text import MIMEText
 import fnmatch
+from spdx_github import web_api_client
 
 @click.command()
 @click.option('--url', prompt='The url of the GitHub repo zip file to scan',
               help='The url of the GitHub repo zip file to scan.')
 
-def main(url, False):
+def main(url):
     #The argument is the url of the GitHub zip file
     repo_zip_url = url
     #If the url gives an error, exit
     if(check_valid_url(repo_zip_url) == False):
         sys.exit()
-    repo_scan(repo_zip_url)
+    begin_scan(repo_zip_url)
+
+def begin_scan(url):
+    scan_info= get_scan_info(url)
+
+    scanner = scan_info['scanner']
+    scanner_location = scan_info[scanner]
+    output_file = scan_info['output_file_name']
+
+    if(scanner_location == 'local'):
+        repo_scan(url)
+    else:
+        web_api_client.run_remote_scan(url, output_file, scanner)
+
+def get_scan_info(url):
+    #Download the zip and get its path.
+    file_location = download_github_zip(url)
+    #Extract the zip and get the path of the extracted directory.
+    repo_path = unzip_file(file_location)
+
+    #The configuration.yml file is stored with the repo.
+    #get_config returns us a dictionary based on this file
+    #with the configuration options.
+    config_path = find_file_location(repo_path, 'configuration.yml')
+    configuration = get_config_yml(config_path, 'configuration.yml')
+
+    scanner = configuration['scanner']
+
+    #Remove the zip file.
+    remove(file_location)
+    #Remove the unzipped directory.
+    shutil.rmtree(repo_path)
+
+    env_path = find_file_location('../', 'environment.yml')
+    environment = get_config_yml(env_path, 'environment.yml')
+
+    scanner_info = environment.copy()
+    scanner_info.update(configuration)
+
+    #scanner_info = environment + configuration
+
+    return scanner_info
 
 #This method goes throught the overall process 
 #of downloading and scanning a repo.
-def repo_scan(repo_zip_url, remote, task_id = 0):
+def repo_scan(repo_zip_url, remote = False, task_id = 0):
 
     #Download the zip and get its path.
     file_location = download_github_zip(repo_zip_url)

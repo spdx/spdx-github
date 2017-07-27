@@ -12,3 +12,5 @@ notification_message: Your new SPDX document is ready.
 send_notification_email: True
 send_pull_request: True
 local_spdx_path: ../
+scancode: http://www.example.com
+scancode_download: http://www.example2.com

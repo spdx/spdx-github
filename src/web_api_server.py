@@ -9,8 +9,8 @@ import threading
 
 app = Flask(__name__)
 
-@app.route('/', methods=['GET','POST'])
-def index():
+@app.route('/StartScan', methods=['GET','POST'])
+def start_scan():
     fo = open('./last_id', "r+")
     task_id = fo.read()
     fo.close()
