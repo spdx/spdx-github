@@ -33,6 +33,7 @@ import smtplib
 from email.mime.text import MIMEText
 import fnmatch
 from spdx_github import web_api_client
+from shutil import copyfile
 
 @click.command()
 @click.option('--url', prompt='The url of the GitHub repo zip file to scan',
@@ -150,12 +151,11 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
     scan(repo_path, spdx_file_path, 'scancode',
          configuration['output_type'])
 
-    if(environment['send_pull_request'] and not(remote)):
-        commit_file(spdx_file_name, repo, environment)
-        create_fork(repo_name, main_repo_user, environment)
-        undo_recent_commits(repo_name, environment)
-        push_to_remote(repo, repo_name, environment)
-        pull_request_to_github(main_repo_user, repo_name, environment)
+    if(environment['send_pull_request']):
+        if(remote):
+            copyfile(spdx_file_path, repo_path + configuration['output_file_name'])
+            spdx_file_name = configuration['output_file_name']
+        make_pull_request(spdx_file_name, repo, environment, repo_name, main_repo_user)
 
     #Remove the zip file.
     remove(file_location)
@@ -237,6 +237,16 @@ def sync_main_repo(repo_path, main_repo_user, repo_name, repo):
     origin.fetch()
     repo.git.reset('--hard','origin/master')
     repo.delete_remote(origin)
+
+#All steps of a pull request including
+#Making the comit, forking, preventing conflicts
+#Pushing changes, and finally making the request
+def make_pull_request(spdx_file_name, repo, environment, repo_name, main_repo_user):
+    commit_file(spdx_file_name, repo, environment)
+    create_fork(repo_name, main_repo_user, environment)
+    undo_recent_commits(repo_name, environment)
+    push_to_remote(repo, repo_name, environment)
+    pull_request_to_github(main_repo_user, repo_name, environment)
 
 #Make a pull request to GitHub with the new SPDX file.
 def pull_request_to_github(main_repo_user, repo_name, environment):
