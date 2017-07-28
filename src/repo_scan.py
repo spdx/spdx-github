@@ -45,12 +45,18 @@ def main(url):
     #If the url gives an error, exit
     if(check_valid_url(repo_zip_url) == False):
         sys.exit()
-    begin_scan(repo_zip_url)
+    scan_successful = begin_scan(repo_zip_url)
+
+    if(not scan_successful):
+        print("Scan failed")
 
 def begin_scan(url):
     scan_info= get_scan_info(url)
 
     scanner = scan_info['scanner']
+    if(scanner not in scan_info):
+        return False
+
     scanner_location = scan_info[scanner]
     output_file = scan_info['output_file_name']
 
@@ -58,6 +64,8 @@ def begin_scan(url):
         repo_scan(url)
     else:
         web_api_client.run_remote_scan(url, output_file, scanner)
+
+    return True
 
 def get_scan_info(url):
     #Download the zip and get its path.
@@ -148,8 +156,11 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
         spdx_file_path = environment['local_spdx_path'] + spdx_file_name
 
     #Scan the extracted directory and put results in a named file.
-    scan(repo_path, spdx_file_path, 'scancode',
-         configuration['output_type'])
+    scan_successful = scan(repo_path, spdx_file_path, 'scancode',
+                          configuration['output_type'])
+
+    if(not scan_successful):
+        return 'Scan Failed'
 
     if(environment['send_pull_request']):
         if(remote):
@@ -176,9 +187,15 @@ def scan(directory_to_scan, output_file_name, scanner, output_type):
     elif(output_type == 'rdf'):
         output_format = 'spdx-rdf'
     #Scan the unzipped directory.
-    print subprocess.check_output(['scancode','--format',
-                                  output_format,directory_to_scan,
-                                  output_file_name])
+    if(scanner == 'scancode'):
+        scan_output = subprocess.check_output(['scancode','--format',
+                                               output_format,directory_to_scan,
+                                               output_file_name])
+        return True
+    else:
+        #This should be reached if a scanner that is not yet implemented
+        #has been specified
+        return False
 
 #Unzip a zip file and return the path to the extracted directory.
 def unzip_file(file_location):

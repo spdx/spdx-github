@@ -17,12 +17,20 @@ def start_scan():
 
     data = request.data
     parsed_data = json.loads(data)
-    #file_name = repo_scan.repo_scan(parsed_data['url'], True, task_id)
+    
+    if(repo_scan.check_valid_url(parsed_data['url']) == False):
+        response = app.response_class(
+            response=json.dumps({'id': task_id, 'status': 'invalid-url'}),
+            status=200,
+            mimetype='application/json'
+        ) 
+        return response       
+
     async_task = run_new_scan(task_id=task_id, url=parsed_data['url'])
     async_task.__init__(task_id, parsed_data['url'])
     async_task.start()
     response = app.response_class(
-        response=json.dumps({'id': task_id}),
+        response=json.dumps({'id': task_id, 'status': 'starting-scan'}),
         status=200,
         mimetype='application/json'
     )
@@ -41,6 +49,12 @@ def task_status(task_id):
             status=200,
             mimetype='application/json'
         )
+    elif(path.isfile('./file_server/' + str(task_id) + '.fail')):
+        response = app.response_class(
+            response=json.dumps({'status': 'scan-failed'}),
+            status=200,
+            mimetype='application/json'
+        )        
     else:
         response = app.response_class(
             response=json.dumps({'status': 'in-progress'}),
@@ -55,7 +69,11 @@ class run_new_scan(threading.Thread):
         self.task_id = task_id
         self.url = url
     def run(self):
-        repo_scan.repo_scan(self.url, True, self.task_id)
+        result = repo_scan.repo_scan(self.url, True, self.task_id)
+        if(result == 'Scan Failed'):
+            fo = open(self.task_id + '.fail', "w+")
+            fo.write('Scan Failed')
+            fo.close()            
 
 if __name__ == '__main__':
     app.run(debug=True)

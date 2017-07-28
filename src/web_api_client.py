@@ -17,19 +17,22 @@ def run_remote_scan(url, output_file, scanner):
     r = requests.post(api_url + 'StartScan', data = request_data)
     print(r)
     parsed_data = json.loads(r.text)
-    status = 'in-progress'
+    status = parsed_data['status']
 
-    while(status != 'complete'):
-        print('scan is in progress')
-        sleep(60)
-        print(api_url + 'TaskStatus/' + parsed_data['id'])
-        r = requests.get(api_url + 'TaskStatus/' + parsed_data['id'])
-        print('r', r)
-        status_response = json.loads(r.text)
-        status = status_response['status']
+    if(status == 'invalid-url'):
+        print('url was invalid!  Cannot begin scan.')
+    else:
+        while(status != 'complete'):
+            print('scan is in progress')
+            sleep(60)
+            print(api_url + 'TaskStatus/' + parsed_data['id'])
+            r = requests.get(api_url + 'TaskStatus/' + parsed_data['id'])
+            print('r', r)
+            status_response = json.loads(r.text)
+            status = status_response['status']
 
-    print('scan is complete')
-    spdx_file = requests.get(download_url + parsed_data['id'] + '.spdx')
-    fo = open(output_file, "w+")
-    fo.write(spdx_file.text)
-    fo.close()
+        print('scan is complete')
+        spdx_file = requests.get(download_url + parsed_data['id'] + '.spdx')
+        fo = open(output_file, "w+")
+        fo.write(spdx_file.text)
+        fo.close()
