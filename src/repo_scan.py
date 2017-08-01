@@ -192,6 +192,9 @@ def scan(directory_to_scan, output_file_name, scanner, output_type):
                                                output_format,directory_to_scan,
                                                output_file_name])
         return True
+    elif(scanner == 'dosocsv2'):
+        scan_output = subprocess.check_output(['dosocs2','oneshot',directory_to_scan])
+        return True
     else:
         #This should be reached if a scanner that is not yet implemented
         #has been specified
@@ -370,6 +373,8 @@ def check_valid_url(repo_zip_url):
         return True
 
 def send_email(environment):
+    #based on
+    #http://naelshiab.com/tutorial-send-email-python/
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
     server.login(environment['gmail_email'], environment['gmail_password'])
@@ -383,6 +388,7 @@ def send_email(environment):
 
 def find_file_location(directory, file_name):
     file_directory = directory
+    #based on
     #https://stackoverflow.com/questions/2186525/use-a-glob-to-find-files-recursively-in-python
     for root, dirnames, filenames in os.walk(directory):
         for filename in fnmatch.filter(filenames, file_name):

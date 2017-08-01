@@ -9,6 +9,9 @@ import threading
 
 app = Flask(__name__)
 
+#Threading part of this code based on
+#https://stackoverflow.com/questions/37141696/how-to-send-asynchronous-request-using-flask-to-an-endpoint-with-small-timeout-s
+
 @app.route('/StartScan', methods=['GET','POST'])
 def start_scan():
     fo = open('./last_id', "r+")
@@ -27,7 +30,6 @@ def start_scan():
         return response       
 
     async_task = run_new_scan(task_id=task_id, url=parsed_data['url'])
-    async_task.__init__(task_id, parsed_data['url'])
     async_task.start()
     response = app.response_class(
         response=json.dumps({'id': task_id, 'status': 'starting-scan'}),
