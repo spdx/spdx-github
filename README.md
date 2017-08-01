@@ -96,6 +96,36 @@ Click "Add webhook"
 
 You are now set up to run a new scan whenever a new push or release is made to your repository.
 
+## Using the web API:
+
+A scanner may be stored on a different machine from the main spdx-github instance.  If this is the case, the scan will be performed through calls to the web API.  In order for this to happen, the configuration and environment files must be set up correctly.
+
+configuration file:
+The configuration file (stored with the repo to be scanned) has the 'scanner' field.  Enter the desired scanner here.  Current options are 'scancode' and 'dosocsv2'
+
+environment file:
+In the environment file, have an entry for the scanner.  This looks similar to the following:
+
+scancode: local
+
+An entry of 'local' tells spdx-github that you have scancode installed locally.  If you instead are using a remote instance of scancode, give the url of the exposed API server here.
+
+If your scanner is remote, one more entry will be needed in the environment file.  It looks like this:
+
+scancode_download: www.example.url
+
+This tells spdx-github the exposed url where you will be serving the completed SPDX files from, which can be different from the API url.
+
+In order to set up the machines for remote communication:
+
+Install spdx-github on both machines.
+
+Install the scanner on the machine you would like.
+
+run 'python web_api_server.py' for the API server on the remote machine.  Use a server to expose it to the internet.
+
+run the file server using python -m SimpleHTTPServer 8000, or change the port if you desire.  SPDX files are served from the src/file_server folder.
+
 
 ## Useage (without webhooks):
 
