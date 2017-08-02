@@ -292,8 +292,8 @@ def pull_request_to_github(main_repo_user, repo_name, environment):
                         + repo_name + '/pulls')
     #This has the username and password from the environment file.
     #It is used to log in for API calls.
-    auth_string = environment['github_username'] + ':' 
-                  + environment['github_password']
+    auth_string = (environment['github_username'] + ':' 
+                   + environment['github_password'])
     #This is the data that will be posted for the pull request.
     #It tells the API what the pull request will be like.
     pull_request_data = ('{"title": "' 
