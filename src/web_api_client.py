@@ -25,7 +25,6 @@ def run_remote_scan(url, output_file, scanner):
     status = parsed_data['status']
 
     #If we got back invalid url, we cannot scan
-    #TODO: add scan-failed to this
     if(status == 'invalid-url'):
         print('url was invalid!  Cannot begin scan.')
     else:
