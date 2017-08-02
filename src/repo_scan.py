@@ -142,7 +142,8 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
         main_repo_user = m.group(1)
         repo_name = m.group(2)
     else:
-        m = re.match(r"https://api.github.com/repos/(\w+)/(\w+)/zipball", repo_zip_url)
+        m = re.match(r"https://api.github.com/repos/(\w+)/(\w+)/zipball", 
+                     repo_zip_url)
         main_repo_user = m.group(1)
         repo_name = m.group(2)
 
@@ -168,12 +169,15 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
     if(not scan_successful):
         return 'Scan Failed'
 
-    #If we are sending a pull request, get the necessary information then make it.
+    #If we are sending a pull request, 
+    #get the necessary information then make it.
     if(environment['send_pull_request']):
         if(remote):
-            copyfile(spdx_file_path, repo_path + configuration['output_file_name'])
+            copyfile(spdx_file_path, repo_path 
+                     + configuration['output_file_name'])
             spdx_file_name = configuration['output_file_name']
-        make_pull_request(spdx_file_name, repo, environment, repo_name, main_repo_user)
+        make_pull_request(spdx_file_name, repo, environment, 
+                          repo_name, main_repo_user)
 
     #Remove the zip file.
     remove(file_location)
@@ -200,7 +204,8 @@ def scan(directory_to_scan, output_file_name, scanner, output_type):
                                                output_file_name])
         return True
     elif(scanner == 'dosocsv2'): #DoSocs scan
-        scan_output = subprocess.check_output(['dosocs2','oneshot',directory_to_scan])
+        scan_output = subprocess.check_output(['dosocs2','oneshot',
+                                               directory_to_scan])
         return True
     else:
         #This should be reached if a scanner that is not yet implemented
@@ -268,7 +273,8 @@ def sync_main_repo(repo_path, main_repo_user, repo_name, repo):
 #All steps of a pull request including
 #Making the comit, forking, preventing conflicts
 #Pushing changes, and finally making the request
-def make_pull_request(spdx_file_name, repo, environment, repo_name, main_repo_user):
+def make_pull_request(spdx_file_name, repo, environment, repo_name, 
+                      main_repo_user):
     commit_file(spdx_file_name, repo, environment)
     create_fork(repo_name, main_repo_user, environment)
     undo_recent_commits(repo_name, environment)
@@ -286,10 +292,12 @@ def pull_request_to_github(main_repo_user, repo_name, environment):
                         + repo_name + '/pulls')
     #This has the username and password from the environment file.
     #It is used to log in for API calls.
-    auth_string = environment['github_username'] + ':' + environment['github_password']
+    auth_string = environment['github_username'] + ':' 
+                  + environment['github_password']
     #This is the data that will be posted for the pull request.
     #It tells the API what the pull request will be like.
-    pull_request_data = ('{"title": "' + environment['github_pull_request_title']
+    pull_request_data = ('{"title": "' 
+                         + environment['github_pull_request_title']
                          + '", "head": "' + environment['github_username']
                          + ':master", "base": "master"}')
 
@@ -316,7 +324,8 @@ def create_fork(repo_name, main_repo_user, environment):
     #The bot user will create a fork of the repository, but first we
     #must check if the bot user already has a fork of the repository.
     #This URL is used for that.
-    check_exists_url = ('https://api.github.com/repos/' + environment['github_username']
+    check_exists_url = ('https://api.github.com/repos/' 
+                        + environment['github_username']
                         + '/' + repo_name)
     #This is the username/repo for the main repo we will be forking
     fork_string = main_repo_user + '/' + repo_name
@@ -392,14 +401,16 @@ def send_email(environment):
     msg['Subject'] = environment['notification_subject']
     msg['From'] = environment['gmail_email']
     msg['To'] = environment['notification_email']
-    server.sendmail(environment['gmail_email'], environment['notification_email'], msg.as_string())
+    server.sendmail(environment['gmail_email'], 
+                    environment['notification_email'], msg.as_string())
     server.quit()
 
 #This finds a file within a given directory.
 def find_file_location(directory, file_name):
     file_directory = directory
     #based on
-    #https://stackoverflow.com/questions/2186525/use-a-glob-to-find-files-recursively-in-python
+    #https://stackoverflow.com/questions/2186525/
+        #use-a-glob-to-find-files-recursively-in-python
     for root, dirnames, filenames in os.walk(directory):
         for filename in fnmatch.filter(filenames, file_name):
             file_directory = root

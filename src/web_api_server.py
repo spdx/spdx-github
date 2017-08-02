@@ -9,8 +9,10 @@ import threading
 
 app = Flask(__name__)
 
-#Threading part of this code based on
-#https://stackoverflow.com/questions/37141696/how-to-send-asynchronous-request-using-flask-to-an-endpoint-with-small-timeout-s
+#Threading portion of this code based on
+#https://stackoverflow.com/questions/37141696/
+    #how-to-send-asynchronous-request-using-
+    #flask-to-an-endpoint-with-small-timeout-s
 
 #This is for starting a new scan
 @app.route('/StartScan', methods=['GET','POST'])
