@@ -26,7 +26,7 @@ def start_scan():
     #Get the posted API request
     data = request.data
     parsed_data = json.loads(data)
-    
+
     #If it is not a valid url, respond with invalid url.
     if(repo_scan.check_valid_url(parsed_data['url']) == False):
         response = app.response_class(
@@ -34,7 +34,7 @@ def start_scan():
             status=200,
             mimetype='application/json'
         ) 
-        return response       
+        return response
 
     #Start a new scan asynchronously so we can send back a response
     #quickly even if it's a long scan.
@@ -52,7 +52,7 @@ def start_scan():
     fo = open('./last_id', "w+")
     fo.write(str(task_id))
     fo.close()
-    
+
     return response
 
 #This is to give the task status.  It is intended
@@ -73,7 +73,7 @@ def task_status(task_id):
             response=json.dumps({'status': 'scan-failed'}),
             status=200,
             mimetype='application/json'
-        )        
+        )
     else:
     #If we have neither succeeded nor failed, we must still be
     #In progress.
@@ -81,8 +81,8 @@ def task_status(task_id):
             response=json.dumps({'status': 'in-progress'}),
             status=200,
             mimetype='application/json'
-        )            
-    return response       
+        )
+    return response
 
 #Run an asynchronous scan.
 class run_new_scan(threading.Thread):
@@ -96,7 +96,7 @@ class run_new_scan(threading.Thread):
         if(result == 'Scan Failed'):
             fo = open(self.task_id + '.fail', "w+")
             fo.write('Scan Failed')
-            fo.close()            
+            fo.close()
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -45,7 +45,7 @@ def run_remote_scan(url, output_file, scanner):
             #once the scan is complete, download the file and write it to the
             #correct file name.
             print('scan is complete')
-            spdx_file = requests.get(download_url 
+            spdx_file = requests.get(download_url
                                      + parsed_data['id'] + '.spdx')
             fo = open(output_file, "w+")
             fo.write(spdx_file.text)

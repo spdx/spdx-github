@@ -142,7 +142,7 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
         main_repo_user = m.group(1)
         repo_name = m.group(2)
     else:
-        m = re.match(r"https://api.github.com/repos/(\w+)/(\w+)/zipball", 
+        m = re.match(r"https://api.github.com/repos/(\w+)/(\w+)/zipball",
                      repo_zip_url)
         main_repo_user = m.group(1)
         repo_name = m.group(2)
@@ -176,7 +176,7 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
             copyfile(spdx_file_path, repo_path 
                      + configuration['output_file_name'])
             spdx_file_name = configuration['output_file_name']
-        make_pull_request(spdx_file_name, repo, environment, 
+        make_pull_request(spdx_file_name, repo, environment,
                           repo_name, main_repo_user)
 
     #Remove the zip file.
@@ -273,7 +273,7 @@ def sync_main_repo(repo_path, main_repo_user, repo_name, repo):
 #All steps of a pull request including
 #Making the comit, forking, preventing conflicts
 #Pushing changes, and finally making the request
-def make_pull_request(spdx_file_name, repo, environment, repo_name, 
+def make_pull_request(spdx_file_name, repo, environment, repo_name,
                       main_repo_user):
     commit_file(spdx_file_name, repo, environment)
     create_fork(repo_name, main_repo_user, environment)
@@ -341,11 +341,11 @@ def create_fork(repo_name, main_repo_user, environment):
 
 def undo_recent_commits(repo_name, environment):
     #This is to access the bot user's forked repo using SSH
-    ssh_remote = ('git@github.com:' + environment['github_username'] 
+    ssh_remote = ('git@github.com:' + environment['github_username']
                   + '/' + repo_name)
 
     #The remote fork may already have an SPDX document that was
-    #not pulled yet by the main repository.  
+    #not pulled yet by the main repository.
     #To avoid merge conflicts, we first
     #remove the latest commits from the fork.
     #This is because merge conflicts would require human intervention.
@@ -365,7 +365,7 @@ def undo_recent_commits(repo_name, environment):
 
 def push_to_remote(repo, repo_name, environment):
     #This is to access the bot user's forked repo using SSH
-    ssh_remote = ('git@github.com:' + environment['github_username'] 
+    ssh_remote = ('git@github.com:' + environment['github_username']
                   + '/' + repo_name)
 
     #The local repository's remote is the main repository.
@@ -396,7 +396,7 @@ def send_email(environment):
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
     server.login(environment['gmail_email'], environment['gmail_password'])
- 
+
     msg = msg = MIMEText(environment['notification_message'])
     msg['Subject'] = environment['notification_subject']
     msg['From'] = environment['gmail_email']
