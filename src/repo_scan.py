@@ -50,6 +50,8 @@ def main(url):
     if(not scan_successful):
         print("Scan failed")
 
+#This selects whether we are using a local scanner or a
+#remote API call.
 def begin_scan(url):
     scan_info= get_scan_info(url)
 
@@ -67,6 +69,8 @@ def begin_scan(url):
 
     return True
 
+#Returns the information in both the config and environment
+#files
 def get_scan_info(url):
     #Download the zip and get its path.
     file_location = download_github_zip(url)
@@ -86,13 +90,13 @@ def get_scan_info(url):
     #Remove the unzipped directory.
     shutil.rmtree(repo_path)
 
+    #Find the environment file and then get the info from it
     env_path = find_file_location('../', 'environment.yml')
     environment = get_config_yml(env_path, 'environment.yml')
 
+    #Bring together the config file and environment file information
     scanner_info = environment.copy()
     scanner_info.update(configuration)
-
-    #scanner_info = environment + configuration
 
     return scanner_info
 
@@ -159,9 +163,12 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
     scan_successful = scan(repo_path, spdx_file_path, 'scancode',
                           configuration['output_type'])
 
+    #If the scan was not successful, don't try to do a pull request or email.
+    #Notify of failure.
     if(not scan_successful):
         return 'Scan Failed'
 
+    #If we are sending a pull request, get the necessary information then make it.
     if(environment['send_pull_request']):
         if(remote):
             copyfile(spdx_file_path, repo_path + configuration['output_file_name'])
@@ -187,12 +194,12 @@ def scan(directory_to_scan, output_file_name, scanner, output_type):
     elif(output_type == 'rdf'):
         output_format = 'spdx-rdf'
     #Scan the unzipped directory.
-    if(scanner == 'scancode'):
+    if(scanner == 'scancode'): #ScanCode Scan
         scan_output = subprocess.check_output(['scancode','--format',
                                                output_format,directory_to_scan,
                                                output_file_name])
         return True
-    elif(scanner == 'dosocsv2'):
+    elif(scanner == 'dosocsv2'): #DoSocs scan
         scan_output = subprocess.check_output(['dosocs2','oneshot',directory_to_scan])
         return True
     else:
@@ -372,6 +379,8 @@ def check_valid_url(repo_zip_url):
     else:
         return True
 
+#This sends a notification email based on information provided
+#in the environment file
 def send_email(environment):
     #based on
     #http://naelshiab.com/tutorial-send-email-python/
@@ -386,6 +395,7 @@ def send_email(environment):
     server.sendmail(environment['gmail_email'], environment['notification_email'], msg.as_string())
     server.quit()
 
+#This finds a file within a given directory.
 def find_file_location(directory, file_name):
     file_directory = directory
     #based on

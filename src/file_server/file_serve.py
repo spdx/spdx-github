@@ -1,3 +1,5 @@
+#This serves files. It is used to allow download
+#of remotely generated SPDX files.
 import SimpleHTTPServer
 import SocketServer
 
