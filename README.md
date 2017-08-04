@@ -118,6 +118,8 @@ This tells spdx-github the exposed url where you will be serving the completed S
 
 In order to set up the machines for remote communication:
 
+### For a remote machine that uses spdx-github:
+
 Install spdx-github on both machines.
 
 Install the scanner on the machine you would like.
@@ -126,6 +128,17 @@ run 'python web_api_server.py' for the API server on the remote machine.  Use a 
 
 run the file server using python -m SimpleHTTPServer 8000, or change the port if you desire.  SPDX files are served from the src/file_server folder.
 
+### For a remote machine that does not use spdx-github:
+
+Install spdx-github on the client machine.
+
+Install the scanner on the server machine.
+
+Create and run a web server that follows the API request-repsonse protocol described [here](https://github.com/spdx/spdx-github/wiki/Architecture#example-requests-and-responses).  This should match the url you gave in the environment file for the API.
+
+Have your server serve the .spdx files it creates and give them names like 'id.spdx' where id is the id you give as a response in the API JSON.  This should match the url you gave in the environment file for the file server.
+
+If you would like other people to use your scanner's server with spdx-github, make the urls for the API and file server available to them.  They will be able to use it by making the changes to the environment and configuration file settings described above.
 
 ## Useage (without webhooks):
 
