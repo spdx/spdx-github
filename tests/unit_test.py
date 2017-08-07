@@ -144,7 +144,13 @@ class MakeCommitTestCase(unittest.TestCase):
     def testCommitMade(self):
         assert self.headcommit.author.name == 'TEST_NAME'
 
+class GetScanInfoTestCase(unittest.TestCase):
+    url = 'https://github.com/abuhman/test_webhooks/archive/master.zip'
+    scanner_info = repo_scan.get_scan_info(url)
 
+    def testGetScanInfo(self):
+        assert 'scanner' in self.scanner_info
+        assert self.scanner_info['scanner'] in self.scanner_info
 
 if __name__ == "__main__":
     unittest.main()
