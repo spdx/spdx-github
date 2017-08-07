@@ -116,6 +116,9 @@ class SyncRepoTestCase(unittest.TestCase):
     output_string = repo.git.diff('origin/master')
     repo.delete_remote(origin)
 
+    def tearDown(self):
+        shutil.rmtree(self.repo_path)
+
     def testRepoSynced(self):
         assert self.output_string == ""
 
