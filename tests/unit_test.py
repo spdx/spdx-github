@@ -82,12 +82,16 @@ class ScanTestCase(unittest.TestCase):
 class CheckURLTestCase(unittest.TestCase):
     good_url = 'https://www.google.com/'
     bad_url = 'https://www.google.com/fail'
+    not_url = 'abcdefg'
 
     def testGoodURL(self):
         assert repo_scan.check_valid_url(self.good_url) == True
 
     def testBadURL(self):
         assert repo_scan.check_valid_url(self.bad_url) == False
+
+    def testNotURL(self):
+        assert repo_scan.check_valid_url(self.not_url) == False
 
 class GetConfigTestCase(unittest.TestCase):
     from spdx_github import repo_scan

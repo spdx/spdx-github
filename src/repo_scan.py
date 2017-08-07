@@ -376,6 +376,9 @@ def push_to_remote(repo, repo_name, environment):
 
 #Check that the url for the zip file can be reached.
 def check_valid_url(repo_zip_url):
+    #Check that it's a URL
+    if(repo_zip_url[:7] != 'http://' and repo_zip_url[:8] != 'https://'):
+        return False
     #Get just the head.
     request = requests.head(repo_zip_url)
     #It should be either success (200's) or redirect(300's).
