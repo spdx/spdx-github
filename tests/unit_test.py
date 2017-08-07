@@ -92,7 +92,7 @@ class CheckURLTestCase(unittest.TestCase):
 class GetConfigTestCase(unittest.TestCase):
     from spdx_github import repo_scan
     configExisting = repo_scan.get_config_yml('./', 'test.yml')
-    configNotExisting = repo_scan.get_config_yml('test/', 'test.yml')
+    configNotExisting = repo_scan.get_config_yml('test/', 'configuration.yml')
 
     def testExistingConfig(self):
         assert self.configExisting['output_file_name'] == 'file_name.SPDX'
@@ -124,9 +124,9 @@ class MakeCommitTestCase(unittest.TestCase):
     subprocess.check_output(['cp', file_name, './test_repo'])
     repo = Repo.init('./test_repo')
     environment = {}
-    environment['name'] = 'TEST_NAME'
-    environment['email'] = 'TEST_EMAIL'
-    environment['commit_message'] = 'TEST_MSG'
+    environment['git_name'] = 'TEST_NAME'
+    environment['git_email'] = 'TEST_EMAIL'
+    environment['git_commit_message'] = 'TEST_MSG'
     repo_scan.commit_file(file_name, repo, environment)
 
     headcommit = repo.head.commit
