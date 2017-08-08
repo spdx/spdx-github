@@ -76,6 +76,16 @@ class ScanTestCase(unittest.TestCase):
     def testScan(self):
         assert path.isfile(self.spdx_file_name)
 
+#Test trying to scan with a scanner that isn't implemented
+class ScannerDoesntExistTestCase(unittest.TestCase):
+    directory = 'test2/'
+    spdx_file_name = ''
+    
+    #result should be false because it is a fake scanner
+    result = repo_scan.scan(directory, spdx_file_name, 'fake_scanner', 'tag-value')
+    
+    def testScannerDoesntExist(self):
+        assert self.result == False
 
 #This checks whether the check_valid_url method correctly determines
 #whether a url results in an error (400 or 500 code).
