@@ -132,17 +132,22 @@ class GetConfigTestCase(unittest.TestCase):
         assert type(self.environNotExisting) is dict
         assert not self.environNotExisting
 
+#Test the method that syncs a repo to its remote
 class SyncRepoTestCase(unittest.TestCase):
+    #Set up a local repo
     repo_path = './test_repo'
     main_repo_user = 'abuhman'
     repo_name = 'test_webhooks'
     repo = Repo.init(repo_path)
+    #Call the sync_main_repo method to sync it with the remote
     repo_scan.sync_main_repo(repo_path, main_repo_user, repo_name, repo)
 
+    #Get the remote origin and fetch any changes
     main_repo_url = ('https://www.github.com/' + main_repo_user + '/'
                      + repo_name + '.git')
     origin = repo.create_remote('origin', main_repo_url)
     repo.git.fetch()
+    #Check the diff between the remote version and the local version
     output_string = repo.git.diff('origin/master')
     repo.delete_remote(origin)
 
@@ -150,9 +155,13 @@ class SyncRepoTestCase(unittest.TestCase):
         shutil.rmtree(self.repo_path)
 
     def testRepoSynced(self):
+        #Output of git diff should be empty if they are synced
         assert self.output_string == ""
 
+#Test the commit_file method which adds a file and makes a
+#commit
 class MakeCommitTestCase(unittest.TestCase):
+    #Get everything ready for the commit
     file_name = 'test.yml'
     subprocess.check_output(['cp', file_name, './test_repo'])
     repo = Repo.init('./test_repo')
@@ -160,10 +169,12 @@ class MakeCommitTestCase(unittest.TestCase):
     environment['git_name'] = 'TEST_NAME'
     environment['git_email'] = 'TEST_EMAIL'
     environment['git_commit_message'] = 'TEST_MSG'
+    #Call the commit method in order to make the commit
     repo_scan.commit_file(file_name, repo, environment)
-
+    #Get the head commit.
     headcommit = repo.head.commit
 
+    #To tear down, reset to origin master, which deletes the test commit
     def tearDown(self):
         main_repo_user = 'abuhman'
         repo_name = 'test_webhooks'
@@ -174,15 +185,25 @@ class MakeCommitTestCase(unittest.TestCase):
         origin.fetch()
         self.repo.git.reset('--hard','origin/master')
 
+    #The head commit name should match the test commit name
+    #because the test commit should be the most recent commit.
     def testCommitMade(self):
         assert self.headcommit.author.name == 'TEST_NAME'
 
+#Get scan info should get us the contents of both the environment
+#and configuration files.
+#This test will fail if the environment and configuration files
+#are set up wrong
 class GetScanInfoTestCase(unittest.TestCase):
     url = 'https://github.com/abuhman/test_webhooks/archive/master.zip'
     scanner_info = repo_scan.get_scan_info(url)
 
+    #Test that we have gotten keys from both environment.yml
+    #and configuration.yml
     def testGetScanInfo(self):
+        #'scanner' is in the configuration file
         assert 'scanner' in self.scanner_info
+        #The value of 'scanner' is in the environment file
         assert self.scanner_info['scanner'] in self.scanner_info
 
 if __name__ == "__main__":
