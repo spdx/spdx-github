@@ -89,6 +89,8 @@ class ScannerDoesntExistTestCase(unittest.TestCase):
 
 #This checks whether the check_valid_url method correctly determines
 #whether a url results in an error (400 or 500 code).
+#or whether it is not a real url (does not start with http://
+#or https:// )
 class CheckURLTestCase(unittest.TestCase):
     good_url = 'https://www.google.com/'
     bad_url = 'https://www.google.com/fail'
@@ -103,18 +105,32 @@ class CheckURLTestCase(unittest.TestCase):
     def testNotURL(self):
         assert repo_scan.check_valid_url(self.not_url) == False
 
+#Check that the YAML configuration/environment method is working.
+#It should return a dictionary with the contents of the config
+#or environment file.
 class GetConfigTestCase(unittest.TestCase):
     from spdx_github import repo_scan
     configExisting = repo_scan.get_config_yml('./', 'test.yml')
     configNotExisting = repo_scan.get_config_yml('test/', 'configuration.yml')
+    environNotExisting = repo_scan.get_config_yml('test/', 'environment.yml')
 
+    #A configuration file that exists should yield values that match
+    #the testing file
     def testExistingConfig(self):
         assert self.configExisting['output_file_name'] == 'file_name.SPDX'
         assert self.configExisting['output_type'] == 'rdf'
 
+    #A configuration file that does not exist should yield default
+    #values
     def testNotExistingConfig(self):
         assert self.configNotExisting['output_file_name'] == 'test.SPDX'
         assert self.configNotExisting['output_type'] == 'tag-value'
+
+    #An environment file that does not exist should yield an empty
+    #dictionary
+    def testNotExistingEnviron(self):
+        assert type(self.environNotExisting) is dict
+        assert not self.environNotExisting
 
 class SyncRepoTestCase(unittest.TestCase):
     repo_path = './test_repo'
