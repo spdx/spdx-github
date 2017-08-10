@@ -206,5 +206,14 @@ class GetScanInfoTestCase(unittest.TestCase):
         #The value of 'scanner' is in the environment file
         assert self.scanner_info['scanner'] in self.scanner_info
 
+#Test the repo_scan method, which handles the process of a
+#local scan.
+class repoScanTestCase(unittest.TestCase):
+    repo_zip_url = 'https://github.com/abuhman/test_webhooks/archive/master.zip'
+    spdx_file_path = repo_scan.repo_scan(repo_zip_url, remote = False, task_id = 0)
+    
+    def testRepoScan(self):
+        assert path.isfile(self.spdx_file_path), self.spdx_file_path
+
 if __name__ == "__main__":
     unittest.main()

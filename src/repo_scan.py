@@ -176,6 +176,10 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
             copyfile(spdx_file_path, repo_path 
                      + configuration['output_file_name'])
             spdx_file_name = configuration['output_file_name']
+	else:
+            copyfile(spdx_file_path, environment['local_spdx_path'] 
+                     + spdx_file_name)
+            spdx_file_path = environment['local_spdx_path'] + spdx_file_name        
         make_pull_request(spdx_file_name, repo, environment,
                           repo_name, main_repo_user)
 
@@ -187,7 +191,7 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
     if(environment['send_notification_email']):
         send_email(environment)
 
-    return spdx_file_name
+    return spdx_file_path
 
 #Run a scan for a repository and output the spdx file.
 #Also handles configuration options for the scan
