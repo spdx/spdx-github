@@ -170,7 +170,7 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
         return 'Scan Failed'
 
     #If we are sending a pull request, 
-    #get the necessary information then make it.
+    #get the necessary information then make it. 
     if(environment['send_pull_request']):
         if(remote):
             copyfile(spdx_file_path, repo_path 

@@ -199,7 +199,7 @@ class GetScanInfoTestCase(unittest.TestCase):
     scanner_info = repo_scan.get_scan_info(url)
 
     #Test that we have gotten keys from both environment.yml
-    #and configuration.yml
+    #and configuration.yml 
     def testGetScanInfo(self):
         #'scanner' is in the configuration file
         assert 'scanner' in self.scanner_info
