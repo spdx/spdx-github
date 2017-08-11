@@ -335,15 +335,27 @@ def create_fork(repo_name, main_repo_user, environment):
                         + '/' + repo_name)
     #This is the username/repo for the main repo we will be forking
     fork_string = main_repo_user + '/' + repo_name
+
+    fork_command = ['git', 'hub', 'fork', fork_string]
+
     #Check whether the remote fork of this repository exists.
     #If it doesn't exist, create a new fork for the bot user.
+    fork_created = check_fork_exists(check_exists_url)
+    if(not fork_created):
+        print('Creating fork')
+        print subprocess.check_output(fork_command)
+    else:
+        print('fork already created')
+
+    return fork_command
+
+def check_fork_exists(check_exists_url):
     response = requests.get(check_exists_url)
     data = response.json()
     if('message' in data and data['message'] == 'Not Found'):
-        print('Creating fork')
-        print subprocess.check_output(['git', 'hub', 'fork', fork_string])
+        return False
     else:
-        print('fork already created')
+        return True
 
 def undo_recent_commits(repo_name, environment):
     #This is to access the bot user's forked repo using SSH

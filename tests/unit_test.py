@@ -212,6 +212,9 @@ class GetScanInfoTestCase(unittest.TestCase):
 class repoScanTestCase(unittest.TestCase):
     repo_zip_url = 'https://github.com/abuhman/test_webhooks/archive/master.zip'
     spdx_file_path = repo_scan.repo_scan(repo_zip_url, remote = False, task_id = 0)
+
+    def tearDown(self):
+        remove(self.spdx_file_path)
     
     def testRepoScan(self):
         assert path.isfile(self.spdx_file_path), self.spdx_file_path
@@ -225,8 +228,6 @@ class pullRequestToGithubTestCase(unittest.TestCase):
     repo_name = 'test_repo_name'
     main_repo_user = 'test_username_main'
 
-    result = repo_scan.pull_request_to_github(main_repo_user, repo_name, environment)
-
     auth_string = environment['github_username'] + ':' + environment['github_password']
     url = 'https://api.github.com/repos/' + main_repo_user + '/' + repo_name + '/pulls'
     pull_request_data = ('{"title": "' 
@@ -239,7 +240,25 @@ class pullRequestToGithubTestCase(unittest.TestCase):
 
     @mock.patch('subprocess.check_output', side_effect = mock_pull_request)   
     def testPullRequestToGithub(self, mock_subprocess):
-        assert self.result == ['curl', '--user', self.auth_string, self.url, '-d', self.pull_request_data], self.result 
+        result = repo_scan.pull_request_to_github(self.main_repo_user, self.repo_name, self.environment)
+        assert result == ['curl', '--user', self.auth_string, self.url, '-d', self.pull_request_data], self.result
+
+class createForkTestCase(unittest.TestCase):
+    environment = {}
+    environment['github_username'] = 'test_username'
+    main_repo_user = 'test_username_main'
+    repo_name = 'test_repo_name'
+
+    fork_string = main_repo_user + '/' + repo_name
+    fork_command = ['git', 'hub', 'fork', fork_string]
+
+    def mock_fork(arguments_list):
+        return arguments_list
+
+    @mock.patch('subprocess.check_output', side_effect = mock_fork)
+    def testFork(self, mock_subprocess):
+        result = repo_scan.create_fork(self.repo_name, self.main_repo_user, self.environment)
+        assert result == self.fork_command
 
 if __name__ == "__main__":
     unittest.main()
