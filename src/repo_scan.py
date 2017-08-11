@@ -305,9 +305,11 @@ def pull_request_to_github(main_repo_user, repo_name, environment):
                          + '", "head": "' + environment['github_username']
                          + ':master", "base": "master"}')
 
+    pull_request_command = ['curl', '--user', auth_string, pull_request_url, '-d', pull_request_data]
+
     #Make the pull request to the main repository
-    print subprocess.check_output(['curl', '--user', auth_string,
-                                  pull_request_url, '-d', pull_request_data])
+    subprocess.check_output(pull_request_command)
+    return pull_request_command
 
 def commit_file(file_name, repo, environment):
     #The index of the repo is used to add the spdx file to be committed.

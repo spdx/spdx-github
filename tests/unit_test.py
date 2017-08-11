@@ -18,6 +18,7 @@ from os import path, remove
 import shutil
 import re
 import subprocess
+import mock
 
 from git import Repo
 
@@ -214,6 +215,31 @@ class repoScanTestCase(unittest.TestCase):
     
     def testRepoScan(self):
         assert path.isfile(self.spdx_file_path), self.spdx_file_path
+
+
+class pullRequestToGithubTestCase(unittest.TestCase):
+    environment = {}
+    environment['github_username'] = 'test_username'
+    environment['github_password'] = 'test_password'
+    environment['github_pull_request_title'] = 'test_title'
+    repo_name = 'test_repo_name'
+    main_repo_user = 'test_username_main'
+
+    result = repo_scan.pull_request_to_github(main_repo_user, repo_name, environment)
+
+    auth_string = environment['github_username'] + ':' + environment['github_password']
+    url = 'https://api.github.com/repos/' + main_repo_user + '/' + repo_name + '/pulls'
+    pull_request_data = ('{"title": "' 
+                         + environment['github_pull_request_title']
+                         + '", "head": "' + environment['github_username']
+                         + ':master", "base": "master"}')
+
+    def mock_pull_request(arguments_list):
+        return arguments_list
+
+    @mock.patch('subprocess.check_output', side_effect = mock_pull_request)   
+    def testPullRequestToGithub(self, mock_subprocess):
+        assert self.result == ['curl', '--user', self.auth_string, self.url, '-d', self.pull_request_data], self.result 
 
 if __name__ == "__main__":
     unittest.main()
