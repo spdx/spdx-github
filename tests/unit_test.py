@@ -260,5 +260,14 @@ class createForkTestCase(unittest.TestCase):
         result = repo_scan.create_fork(self.repo_name, self.main_repo_user, self.environment)
         assert result == self.fork_command
 
+class checkForkExistsTestCase(unittest.TestCase):
+    fork_exists = ('https://api.github.com/repos/abuhmantest/test_webhooks')
+    fork_not_exists = 'https://api.github.com/repos/test_user/test_fork'
+
+    def testForkExists(self):
+        assert repo_scan.check_fork_exists(self.fork_exists)
+    def testForkNotExists(self):
+        assert not repo_scan.check_fork_exists(self.fork_not_exists)
+
 if __name__ == "__main__":
     unittest.main()
