@@ -269,5 +269,14 @@ class checkForkExistsTestCase(unittest.TestCase):
     def testForkNotExists(self):
         assert not repo_scan.check_fork_exists(self.fork_not_exists)
 
+class findFileLocationTestCase(unittest.TestCase):
+    directory = './'
+    file_name = 'configuration.YAML'
+
+    location = repo_scan.find_file_location(directory, file_name)
+
+    def testFileLocation(self):
+         assert self.location == './test2/', self.location
+
 if __name__ == "__main__":
     unittest.main()
