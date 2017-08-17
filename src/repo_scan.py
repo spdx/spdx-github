@@ -117,11 +117,11 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
     #Check that the configuration file's output file name ends
     #with the spdx extension. If not, add it.
     if(remote):
-        spdx_file_name = task_id + '.spdx'
+        spdx_file_name = '{}.spdx'.format(task_id)
     else:
         suffix = configuration['output_file_name'][-5:]
         if(suffix != '.SPDX' and suffix != '.spdx'):
-            spdx_file_name = configuration['output_file_name'] + '.spdx'
+            spdx_file_name = '{}.spdx'.format(configuration['output_file_name'])
         else:
             spdx_file_name = configuration['output_file_name']
 
@@ -153,12 +153,12 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
     sync_main_repo(repo_path, main_repo_user, repo_name, repo)
 
     if(remote):
-        spdx_file_path = './file_server/' + spdx_file_name
+        spdx_file_path = './file_server/{}'.format(spdx_file_name)
     elif(environment['send_pull_request']):
         #This is the path to the spdx file stored locally
-        spdx_file_path = repo_path + spdx_file_name
+        spdx_file_path = '{}{}'.format(repo_path, spdx_file_name)
     else:
-        spdx_file_path = environment['local_spdx_path'] + spdx_file_name
+        spdx_file_path = '{}{}'.format(environment['local_spdx_path'], spdx_file_name)
 
     #Scan the extracted directory and put results in a named file.
     scan_successful = scan(repo_path, spdx_file_path, 'scancode',
@@ -173,13 +173,13 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
     #get the necessary information then make it. 
     if(environment['send_pull_request']):
         if(remote):
-            copyfile(spdx_file_path, repo_path 
-                     + configuration['output_file_name'])
+            copyfile(spdx_file_path, '{}{}'.format(repo_path, 
+                     configuration['output_file_name']))
             spdx_file_name = configuration['output_file_name']
 	else:
-            copyfile(spdx_file_path, environment['local_spdx_path'] 
-                     + spdx_file_name)
-            spdx_file_path = environment['local_spdx_path'] + spdx_file_name        
+            copyfile(spdx_file_path, '{}{}'.format(environment['local_spdx_path'], 
+                     spdx_file_name))
+            spdx_file_path = '{}{}'.format(environment['local_spdx_path'], spdx_file_name)        
         make_pull_request(spdx_file_name, repo, environment,
                           repo_name, main_repo_user)
 
@@ -239,7 +239,7 @@ def download_github_zip(repo_zip_url):
     #This is the path to the directory containing the zip file.
     directory_path = os.path.dirname(os.path.realpath(__file__))
     #Concatenate the file name with the path.
-    file_location = directory_path + zip_file_name
+    file_location = '{}{}'.format(directory_path, zip_file_name)
 
     #Write the zip file in chunks.
     with open(file_location, 'wb') as fd:
@@ -253,13 +253,13 @@ def download_github_zip(repo_zip_url):
 #and return it.  If the file is not found, create
 #some default options for it.
 def get_config_yml(directory, file_name):
-    config_file = directory + file_name
+    config_file = '{}{}'.format(directory, file_name)
     if(path.isfile(config_file)):
         stream = file(config_file, 'r')
         configuration = safe_load(stream)
     elif(file_name == 'configuration.yml'):
         configuration = {}
-        configuration['output_file_name'] = directory[:-1] + '.SPDX'
+        configuration['output_file_name'] = '{}.SPDX'.format(directory[:-1])
 	configuration['output_type'] = 'tag-value'
     else:
         configuration = {}
@@ -267,8 +267,8 @@ def get_config_yml(directory, file_name):
 
 #Sync up a local repo with its remote repository.
 def sync_main_repo(repo_path, main_repo_user, repo_name, repo):
-    main_repo_url = ('https://www.github.com/' + main_repo_user + '/'
-                     + repo_name + '.git')
+    main_repo_url = ('https://www.github.com/{}/{}.git'.format(main_repo_user,
+                     repo_name))
     origin = repo.create_remote('origin', main_repo_url)
     origin.fetch()
     repo.git.reset('--hard','origin/master')
@@ -292,12 +292,12 @@ def pull_request_to_github(main_repo_user, repo_name, environment):
     #pull request process.
 
     #This is the API URL to make a pull request
-    pull_request_url = ('https://api.github.com/repos/' + main_repo_user + '/'
-                        + repo_name + '/pulls')
+    pull_request_url = ('https://api.github.com/repos/{}/{}/pulls'.format(main_repo_user,
+                        repo_name))
     #This has the username and password from the environment file.
     #It is used to log in for API calls.
-    auth_string = (environment['github_username'] + ':' 
-                   + environment['github_password'])
+    auth_string = ('{}:{}'.format(environment['github_username'], 
+                   environment['github_password']))
     #This is the data that will be posted for the pull request.
     #It tells the API what the pull request will be like.
     pull_request_data = ('{"title": "' 
@@ -330,11 +330,10 @@ def create_fork(repo_name, main_repo_user, environment):
     #The bot user will create a fork of the repository, but first we
     #must check if the bot user already has a fork of the repository.
     #This URL is used for that.
-    check_exists_url = ('https://api.github.com/repos/' 
-                        + environment['github_username']
-                        + '/' + repo_name)
+    check_exists_url = ('https://api.github.com/repos/{}/{}'.format( 
+                        environment['github_username'], repo_name))
     #This is the username/repo for the main repo we will be forking
-    fork_string = main_repo_user + '/' + repo_name
+    fork_string = '{}/{}'.format(main_repo_user, repo_name)
 
     fork_command = ['git', 'hub', 'fork', fork_string]
 
@@ -360,8 +359,8 @@ def check_fork_exists(check_exists_url):
 
 def undo_recent_commits(repo_name, environment):
     #This is to access the bot user's forked repo using SSH
-    ssh_remote = ('git@github.com:' + environment['github_username']
-                  + '/' + repo_name)
+    ssh_remote = ('git@github.com:{}/{}'.format(environment['github_username'],
+                  repo_name))
 
     #The remote fork may already have an SPDX document that was
     #not pulled yet by the main repository.
@@ -373,7 +372,7 @@ def undo_recent_commits(repo_name, environment):
     #without the first update being accepted into the main repository
     #The only data that is lost is our own scanner-generated spdx
     #document from the most recent scan prior to this one.
-    repo2 = Repo.init(repo_name + '2')
+    repo2 = Repo.init('{}2'.format(repo_name))
     origin = repo2.create_remote('origin', ssh_remote)
     origin.fetch()
     origin.pull(origin.refs[0].remote_head)
@@ -385,8 +384,8 @@ def undo_recent_commits(repo_name, environment):
 #This method pushes to a remote repository.
 def push_to_remote(repo, repo_name, environment):
     #This is to access the bot user's forked repo using SSH
-    ssh_remote = ('git@github.com:' + environment['github_username']
-                  + '/' + repo_name)
+    ssh_remote = ('git@github.com:{}/{}'.format(environment['github_username'],
+                  repo_name))
 
     #The local repository's remote is the main repository.
     #Change its remote to the fork of the main repository,
@@ -405,8 +404,8 @@ def check_valid_url(repo_zip_url):
     #Otherwise, inform the user of failure.
     if (request.status_code >= 400 or request.status_code < 200):
         print('Could not reach URL provided.\n')
-        print('Provided url was ' + repo_zip_url
-              + ' and resulted in status code ' + str(request.status_code))
+        print('Provided url was {} and resulted in status code {}'.format(
+              repo_zip_url,str(request.status_code)))
         return False
     else:
         return True
