@@ -349,6 +349,7 @@ def create_fork(repo_name, main_repo_user, environment):
 
     return fork_command
 
+#This method checks whether or not a fork exists
 def check_fork_exists(check_exists_url):
     response = requests.get(check_exists_url)
     data = response.json()
@@ -381,6 +382,7 @@ def undo_recent_commits(repo_name, environment):
     repo2.git.push('origin', 'HEAD:master', '--force')
     shutil.rmtree(repo_name + '2')
 
+#This method pushes to a remote repository.
 def push_to_remote(repo, repo_name, environment):
     #This is to access the bot user's forked repo using SSH
     ssh_remote = ('git@github.com:' + environment['github_username']
