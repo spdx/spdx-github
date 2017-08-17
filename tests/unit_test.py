@@ -219,7 +219,9 @@ class repoScanTestCase(unittest.TestCase):
     def testRepoScan(self):
         assert path.isfile(self.spdx_file_path), self.spdx_file_path
 
-
+#Tests the pull_request_to_github method, which makes a pull request
+#to github.  This test does not actually make a pull request
+#due to using a mock in place of the API call.
 class pullRequestToGithubTestCase(unittest.TestCase):
     environment = {}
     environment['github_username'] = 'test_username'
@@ -243,6 +245,9 @@ class pullRequestToGithubTestCase(unittest.TestCase):
         result = repo_scan.pull_request_to_github(self.main_repo_user, self.repo_name, self.environment)
         assert result == ['curl', '--user', self.auth_string, self.url, '-d', self.pull_request_data], self.result
 
+#Tests the create_fork method, which creates a fork
+#of a remote repository.  This test does not actually
+#create a fork and replaces the call with a mock.
 class createForkTestCase(unittest.TestCase):
     environment = {}
     environment['github_username'] = 'test_username'
@@ -260,6 +265,8 @@ class createForkTestCase(unittest.TestCase):
         result = repo_scan.create_fork(self.repo_name, self.main_repo_user, self.environment)
         assert result == self.fork_command
 
+#This tests the check_fork_exists method, which determines
+#if a fork of a remote repository exists.
 class checkForkExistsTestCase(unittest.TestCase):
     fork_exists = ('https://api.github.com/repos/abuhmantest/test_webhooks')
     fork_not_exists = 'https://api.github.com/repos/test_user/test_fork'
@@ -269,6 +276,8 @@ class checkForkExistsTestCase(unittest.TestCase):
     def testForkNotExists(self):
         assert not repo_scan.check_fork_exists(self.fork_not_exists)
 
+#Tests the find_file_location method that dynamically
+#finds a file in a directory.
 class findFileLocationTestCase(unittest.TestCase):
     directory = './'
     file_name = 'configuration.YAML'
