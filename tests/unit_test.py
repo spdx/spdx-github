@@ -21,6 +21,7 @@ import subprocess
 import mock
 
 from git import Repo
+from git import test
 
 from spdx_github import repo_scan
 
@@ -64,7 +65,7 @@ class ScanTestCase(unittest.TestCase):
 
     def setUp(self):
         #Set output file name to the directory name .SPDX.
-        self.spdx_file_name = self.directory[:-1] + '.SPDX'
+        self.spdx_file_name = '{}.SPDX'.format(self.directory[:-1])
 
         #scan the extracted directory and put results in a named file
         repo_scan.scan(self.directory, self.spdx_file_name,
@@ -144,8 +145,8 @@ class SyncRepoTestCase(unittest.TestCase):
     repo_scan.sync_main_repo(repo_path, main_repo_user, repo_name, repo)
 
     #Get the remote origin and fetch any changes
-    main_repo_url = ('https://www.github.com/' + main_repo_user + '/'
-                     + repo_name + '.git')
+    main_repo_url = ('https://www.github.com/{}/{}.git'.format(main_repo_user,
+                     repo_name))
     origin = repo.create_remote('origin', main_repo_url)
     repo.git.fetch()
     #Check the diff between the remote version and the local version
@@ -179,8 +180,8 @@ class MakeCommitTestCase(unittest.TestCase):
     def tearDown(self):
         main_repo_user = 'abuhman'
         repo_name = 'test_webhooks'
-        main_repo_url = ('https://www.github.com/' + main_repo_user + '/'
-                         + repo_name + '.git')
+        main_repo_url = ('https://www.github.com/{}/{}.git'.format(main_repo_user,
+                         repo_name))
 
         origin = self.repo.create_remote('origin', main_repo_url)
         origin.fetch()
@@ -230,12 +231,11 @@ class pullRequestToGithubTestCase(unittest.TestCase):
     repo_name = 'test_repo_name'
     main_repo_user = 'test_username_main'
 
-    auth_string = environment['github_username'] + ':' + environment['github_password']
-    url = 'https://api.github.com/repos/' + main_repo_user + '/' + repo_name + '/pulls'
-    pull_request_data = ('{"title": "' 
-                         + environment['github_pull_request_title']
-                         + '", "head": "' + environment['github_username']
-                         + ':master", "base": "master"}')
+    auth_string = '{}:{}'.format(environment['github_username'], environment['github_password'])
+    url = 'https://api.github.com/repos/{}/{}/pulls'.format(main_repo_user, repo_name)
+    pull_request_data = ('{{"title": "{}", "head": "{}:master", "base": "master"}}'.format(
+                         environment['github_pull_request_title'], 
+                         environment['github_username']))
 
     def mock_pull_request(arguments_list):
         return arguments_list
@@ -254,7 +254,7 @@ class createForkTestCase(unittest.TestCase):
     main_repo_user = 'test_username_main'
     repo_name = 'test_repo_name'
 
-    fork_string = main_repo_user + '/' + repo_name
+    fork_string = '{}/{}'.format(main_repo_user, repo_name)
     fork_command = ['git', 'hub', 'fork', fork_string]
 
     def mock_fork(arguments_list):
