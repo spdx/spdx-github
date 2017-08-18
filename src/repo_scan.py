@@ -267,8 +267,7 @@ def get_config_yml(directory, file_name):
 
 #Sync up a local repo with its remote repository.
 def sync_main_repo(repo_path, main_repo_user, repo_name, repo):
-    main_repo_url = ('https://www.github.com/{}/{}.git'.format(main_repo_user,
-                     repo_name))
+    main_repo_url = ('https://www.github.com/{}/{}.git'.format(main_repo_user, repo_name))
     origin = repo.create_remote('origin', main_repo_url)
     origin.fetch()
     repo.git.reset('--hard','origin/master')
@@ -300,10 +299,9 @@ def pull_request_to_github(main_repo_user, repo_name, environment):
                    environment['github_password']))
     #This is the data that will be posted for the pull request.
     #It tells the API what the pull request will be like.
-    pull_request_data = ('{"title": "' 
-                         + environment['github_pull_request_title']
-                         + '", "head": "' + environment['github_username']
-                         + ':master", "base": "master"}')
+    pull_request_data = ('{{"title": "{}", "head": "{}:master", "base": "master"}}'.format(
+                         environment['github_pull_request_title'], 
+                         environment['github_username']))
 
     pull_request_command = ['curl', '--user', auth_string, pull_request_url, '-d', pull_request_data]
 
@@ -379,7 +377,7 @@ def undo_recent_commits(repo_name, environment):
     git2 = repo2.git
     git2.reset('--hard', 'HEAD~2')
     repo2.git.push('origin', 'HEAD:master', '--force')
-    shutil.rmtree(repo_name + '2')
+    shutil.rmtree('{}2'.format(repo_name))
 
 #This method pushes to a remote repository.
 def push_to_remote(repo, repo_name, environment):
@@ -437,7 +435,7 @@ def find_file_location(directory, file_name):
         for filename in fnmatch.filter(filenames, file_name):
             file_directory = root
     if(file_directory[-1:] != '/'):
-        file_directory = file_directory + '/'
+        file_directory = '{}/'.format(file_directory)
     return file_directory
 
 if __name__ == "__main__": main()
