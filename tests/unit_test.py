@@ -234,13 +234,13 @@ class pullRequestToGithubTestCase(unittest.TestCase):
     auth_string = '{}:{}'.format(environment['github_username'], environment['github_password'])
     url = 'https://api.github.com/repos/{}/{}/pulls'.format(main_repo_user, repo_name)
     pull_request_data = ('{{"title": "{}", "head": "{}:master", "base": "master"}}'.format(
-                         environment['github_pull_request_title'], 
+                         environment['github_pull_request_title'],
                          environment['github_username']))
 
     def mock_pull_request(arguments_list):
         return arguments_list
 
-    @mock.patch('subprocess.check_output', side_effect = mock_pull_request)   
+    @mock.patch('subprocess.check_output', side_effect = mock_pull_request)
     def testPullRequestToGithub(self, mock_subprocess):
         result = repo_scan.pull_request_to_github(self.main_repo_user, self.repo_name, self.environment)
         assert result == ['curl', '--user', self.auth_string, self.url, '-d', self.pull_request_data], self.result

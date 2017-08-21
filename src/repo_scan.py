@@ -53,8 +53,10 @@ def main(url):
 #This selects whether we are using a local scanner or a
 #remote API call.
 def begin_scan(url):
+    #Get data from both config and env
     scan_info= get_scan_info(url)
 
+    
     scanner = scan_info['scanner']
     if(scanner not in scan_info):
         return False
@@ -170,16 +172,16 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
         return 'Scan Failed'
 
     #If we are sending a pull request, 
-    #get the necessary information then make it. 
+    #get the necessary information then make it.
     if(environment['send_pull_request']):
         if(remote):
-            copyfile(spdx_file_path, '{}{}'.format(repo_path, 
+            copyfile(spdx_file_path, '{}{}'.format(repo_path,
                      configuration['output_file_name']))
             spdx_file_name = configuration['output_file_name']
 	else:
-            copyfile(spdx_file_path, '{}{}'.format(environment['local_spdx_path'], 
+            copyfile(spdx_file_path, '{}{}'.format(environment['local_spdx_path'],
                      spdx_file_name))
-            spdx_file_path = '{}{}'.format(environment['local_spdx_path'], spdx_file_name)        
+            spdx_file_path = '{}{}'.format(environment['local_spdx_path'], spdx_file_name)
         make_pull_request(spdx_file_name, repo, environment,
                           repo_name, main_repo_user)
 
@@ -328,7 +330,7 @@ def create_fork(repo_name, main_repo_user, environment):
     #The bot user will create a fork of the repository, but first we
     #must check if the bot user already has a fork of the repository.
     #This URL is used for that.
-    check_exists_url = ('https://api.github.com/repos/{}/{}'.format( 
+    check_exists_url = ('https://api.github.com/repos/{}/{}'.format(
                         environment['github_username'], repo_name))
     #This is the username/repo for the main repo we will be forking
     fork_string = '{}/{}'.format(main_repo_user, repo_name)

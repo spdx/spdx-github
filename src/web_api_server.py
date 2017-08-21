@@ -48,7 +48,7 @@ def start_scan():
             response=json.dumps({'id': task_id, 'status': 'invalid-url'}),
             status=200,
             mimetype='application/json'
-        ) 
+        )
         return response
 
     #Start a new scan asynchronously so we can send back a response
