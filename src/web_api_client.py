@@ -48,8 +48,8 @@ def run_remote_scan(url, output_file, scanner):
             print('scan is in progress')
             sleep(60)
             print('{}TaskStatus/{}'.format(api_url, parsed_data['id']))
-            r = requests.get('{}TaskStatus/{}'.format(api_url, 
-			                                          parsed_data['id']))
+            r = requests.get('{}TaskStatus/{}'.format(api_url,
+                                                      parsed_data['id']))
             print('r', r)
             status_response = json.loads(r.text)
             status = status_response['status']

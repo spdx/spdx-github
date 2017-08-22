@@ -247,10 +247,11 @@ class pullRequestToGithubTestCase(unittest.TestCase):
 
     @mock.patch('subprocess.check_output', side_effect = mock_pull_request)
     def testPullRequestToGithub(self, mock_subprocess):
-        result = repo_scan.pull_request_to_github(self.main_repo_user, 
-		                                          self.repo_name, 
-												  self.environment)
-        assert result == ['curl', '--user', self.auth_string, self.url, 
+        result = repo_scan.pull_request_to_github(self.main_repo_user,
+                                                  self.repo_name,
+                                                  self.environment)
+
+        assert result == ['curl', '--user', self.auth_string, self.url,
 		                  '-d', self.pull_request_data], self.result
 
 #Tests the create_fork method, which creates a fork
@@ -270,8 +271,8 @@ class createForkTestCase(unittest.TestCase):
 
     @mock.patch('subprocess.check_output', side_effect = mock_fork)
     def testFork(self, mock_subprocess):
-        result = repo_scan.create_fork(self.repo_name, self.main_repo_user, 
-		                               self.environment)
+        result = repo_scan.create_fork(self.repo_name, self.main_repo_user,
+                                       self.environment)
         assert result == self.fork_command
 
 #This tests the check_fork_exists method, which determines
