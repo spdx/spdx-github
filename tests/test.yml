@@ -1,0 +1,5 @@
+output_file_name: file_name.SPDX
+output_type: rdf
+scanner: scancode
+git_name: test
+git_email: test@mail.com

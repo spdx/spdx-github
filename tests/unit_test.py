@@ -18,8 +18,10 @@ from os import path, remove
 import shutil
 import re
 import subprocess
+import mock
 
 from git import Repo
+from git import test
 
 from spdx_github import repo_scan
 
@@ -63,7 +65,7 @@ class ScanTestCase(unittest.TestCase):
 
     def setUp(self):
         #Set output file name to the directory name .SPDX.
-        self.spdx_file_name = self.directory[:-1] + '.SPDX'
+        self.spdx_file_name = '{}.SPDX'.format(self.directory[:-1])
 
         #scan the extracted directory and put results in a named file
         repo_scan.scan(self.directory, self.spdx_file_name,
@@ -82,7 +84,8 @@ class ScannerDoesntExistTestCase(unittest.TestCase):
     spdx_file_name = ''
     
     #result should be false because it is a fake scanner
-    result = repo_scan.scan(directory, spdx_file_name, 'fake_scanner', 'tag-value')
+    result = repo_scan.scan(directory, spdx_file_name, 'fake_scanner', 
+	                        'tag-value')
     
     def testScannerDoesntExist(self):
         assert self.result == False
@@ -143,8 +146,8 @@ class SyncRepoTestCase(unittest.TestCase):
     repo_scan.sync_main_repo(repo_path, main_repo_user, repo_name, repo)
 
     #Get the remote origin and fetch any changes
-    main_repo_url = ('https://www.github.com/' + main_repo_user + '/'
-                     + repo_name + '.git')
+    main_repo_url = ('https://www.github.com/{}/{}.git'.format(main_repo_user,
+                     repo_name))
     origin = repo.create_remote('origin', main_repo_url)
     repo.git.fetch()
     #Check the diff between the remote version and the local version
@@ -178,8 +181,8 @@ class MakeCommitTestCase(unittest.TestCase):
     def tearDown(self):
         main_repo_user = 'abuhman'
         repo_name = 'test_webhooks'
-        main_repo_url = ('https://www.github.com/' + main_repo_user + '/'
-                         + repo_name + '.git')
+        main_repo_url = ('https://www.github.com/{}/{}.git'.format(
+		                 main_repo_user, repo_name))
 
         origin = self.repo.create_remote('origin', main_repo_url)
         origin.fetch()
@@ -199,12 +202,107 @@ class GetScanInfoTestCase(unittest.TestCase):
     scanner_info = repo_scan.get_scan_info(url)
 
     #Test that we have gotten keys from both environment.yml
-    #and configuration.yml
+    #and configuration.yml 
     def testGetScanInfo(self):
         #'scanner' is in the configuration file
         assert 'scanner' in self.scanner_info
         #The value of 'scanner' is in the environment file
         assert self.scanner_info['scanner'] in self.scanner_info
+
+#Test the repo_scan method, which handles the process of a
+#local scan.
+class repoScanTestCase(unittest.TestCase):
+    repo_zip_url = 'https://github.com/abuhman/test_webhooks/archive/master.zip'
+    spdx_file_path = repo_scan.repo_scan(repo_zip_url, remote = False, 
+	                                     task_id = 0)
+
+    def tearDown(self):
+        remove(self.spdx_file_path)
+    
+    def testRepoScan(self):
+        assert path.isfile(self.spdx_file_path), self.spdx_file_path
+
+#Tests the pull_request_to_github method, which makes a pull request
+#to github.  This test does not actually make a pull request
+#due to using a mock in place of the API call.
+class pullRequestToGithubTestCase(unittest.TestCase):
+    #Construct dummy input to call the pull request method 
+    environment = {}
+    environment['github_username'] = 'test_username'
+    environment['github_password'] = 'test_password'
+    environment['github_pull_request_title'] = 'test_title'
+    repo_name = 'test_repo_name'
+    main_repo_user = 'test_username_main'
+
+    auth_string = '{}:{}'.format(environment['github_username'], 
+	                             environment['github_password'])
+    url = 'https://api.github.com/repos/{}/{}/pulls'.format(main_repo_user, 
+	                                                        repo_name)
+    pull_request_data = ('{{"title": "{}", "head": "{}:master",'
+	                     ' "base": "master"}}'.format(
+                         environment['github_pull_request_title'],
+                         environment['github_username']))
+
+    def mock_pull_request(arguments_list):
+        return arguments_list
+
+    #Call the pull request method (the actual pull request portion is
+    #mocked)
+    @mock.patch('subprocess.check_output', side_effect = mock_pull_request)
+    def testPullRequestToGithub(self, mock_subprocess):
+        result = repo_scan.pull_request_to_github(self.main_repo_user,
+                                                  self.repo_name,
+                                                  self.environment)
+
+        #Make sure the command used for the pull request was correct
+        assert result == ['curl', '--user', self.auth_string, self.url,
+		                  '-d', self.pull_request_data], self.result
+
+#Tests the create_fork method, which creates a fork
+#of a remote repository.  This test does not actually
+#create a fork and replaces the call with a mock.
+class createForkTestCase(unittest.TestCase):
+    #Construct testing input for the fork method
+    environment = {}
+    environment['github_username'] = 'test_username'
+    main_repo_user = 'test_username_main'
+    repo_name = 'test_repo_name'
+
+    fork_string = '{}/{}'.format(main_repo_user, repo_name)
+    fork_command = ['git', 'hub', 'fork', fork_string]
+
+    def mock_fork(arguments_list):
+        return arguments_list
+
+    #Call the fork method using the testing input and
+    #check that the mocked fork command was correctly called.
+    @mock.patch('subprocess.check_output', side_effect = mock_fork)
+    def testFork(self, mock_subprocess):
+        result = repo_scan.create_fork(self.repo_name, self.main_repo_user,
+                                       self.environment)
+        assert result == self.fork_command
+
+#This tests the check_fork_exists method, which determines
+#if a fork of a remote repository exists.
+class checkForkExistsTestCase(unittest.TestCase):
+    fork_exists = ('https://api.github.com/repos/abuhmantest/test_webhooks')
+    fork_not_exists = 'https://api.github.com/repos/test_user/test_fork'
+
+    def testForkExists(self):
+        assert repo_scan.check_fork_exists(self.fork_exists)
+    def testForkNotExists(self):
+        assert not repo_scan.check_fork_exists(self.fork_not_exists)
+
+#Tests the find_file_location method that dynamically
+#finds a file in a directory.
+class findFileLocationTestCase(unittest.TestCase):
+    directory = './'
+    file_name = 'configuration.YAML'
+
+    location = repo_scan.find_file_location(directory, file_name)
+
+    def testFileLocation(self):
+         assert self.location == './test2/', self.location
 
 if __name__ == "__main__":
     unittest.main()
