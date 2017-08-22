@@ -48,7 +48,7 @@ def start_scan():
             response=json.dumps({'id': task_id, 'status': 'invalid-url'}),
             status=200,
             mimetype='application/json'
-        ) 
+        )
         return response
 
     #Start a new scan asynchronously so we can send back a response
@@ -76,14 +76,14 @@ def start_scan():
 @app.route('/TaskStatus/<int:task_id>')
 def task_status(task_id):
     #If the spdx file has been created, the scan is complete.
-    if(path.isfile('./file_server/' + str(task_id) + '.spdx')):
+    if(path.isfile('./file_server/{}.spdx'.format(str(task_id)))):
         response = app.response_class(
             response=json.dumps({'status': 'complete'}),
             status=200,
             mimetype='application/json'
         )
     #if id.fail file was created, the scan failed.
-    elif(path.isfile('./file_server/' + str(task_id) + '.fail')):
+    elif(path.isfile('./file_server/{}.fail'.format(str(task_id)))):
         response = app.response_class(
             response=json.dumps({'status': 'scan-failed'}),
             status=200,
@@ -109,7 +109,7 @@ class run_new_scan(threading.Thread):
         result = repo_scan.repo_scan(self.url, True, self.task_id)
         #if we get back that the scan failed, create the .fail file.
         if(result == 'Scan Failed'):
-            fo = open(self.task_id + '.fail', "w+")
+            fo = open('{}.fail'.format(self.task_id), "w+")
             fo.write('Scan Failed')
             fo.close()
 

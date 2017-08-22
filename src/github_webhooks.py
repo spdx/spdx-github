@@ -25,8 +25,8 @@ def github_webhooks():
     if request.method == 'POST':
         data = request.data
         parsed_data = json.loads(data)
-        zipball = ('https://api.github.com/repos/'
-                   + parsed_data['repository']['full_name'] + '/zipball')
+        zipball = ('https://api.github.com/repos/{}/zipball'.format(
+                   parsed_data['repository']['full_name']))
         repo_scan.begin_scan(zipball)
         return "Post"
     else:
