@@ -84,7 +84,8 @@ class ScannerDoesntExistTestCase(unittest.TestCase):
     spdx_file_name = ''
     
     #result should be false because it is a fake scanner
-    result = repo_scan.scan(directory, spdx_file_name, 'fake_scanner', 'tag-value')
+    result = repo_scan.scan(directory, spdx_file_name, 'fake_scanner', 
+	                        'tag-value')
     
     def testScannerDoesntExist(self):
         assert self.result == False
@@ -180,8 +181,8 @@ class MakeCommitTestCase(unittest.TestCase):
     def tearDown(self):
         main_repo_user = 'abuhman'
         repo_name = 'test_webhooks'
-        main_repo_url = ('https://www.github.com/{}/{}.git'.format(main_repo_user,
-                         repo_name))
+        main_repo_url = ('https://www.github.com/{}/{}.git'.format(
+		                 main_repo_user, repo_name))
 
         origin = self.repo.create_remote('origin', main_repo_url)
         origin.fetch()
@@ -212,7 +213,8 @@ class GetScanInfoTestCase(unittest.TestCase):
 #local scan.
 class repoScanTestCase(unittest.TestCase):
     repo_zip_url = 'https://github.com/abuhman/test_webhooks/archive/master.zip'
-    spdx_file_path = repo_scan.repo_scan(repo_zip_url, remote = False, task_id = 0)
+    spdx_file_path = repo_scan.repo_scan(repo_zip_url, remote = False, 
+	                                     task_id = 0)
 
     def tearDown(self):
         remove(self.spdx_file_path)
@@ -231,9 +233,12 @@ class pullRequestToGithubTestCase(unittest.TestCase):
     repo_name = 'test_repo_name'
     main_repo_user = 'test_username_main'
 
-    auth_string = '{}:{}'.format(environment['github_username'], environment['github_password'])
-    url = 'https://api.github.com/repos/{}/{}/pulls'.format(main_repo_user, repo_name)
-    pull_request_data = ('{{"title": "{}", "head": "{}:master", "base": "master"}}'.format(
+    auth_string = '{}:{}'.format(environment['github_username'], 
+	                             environment['github_password'])
+    url = 'https://api.github.com/repos/{}/{}/pulls'.format(main_repo_user, 
+	                                                        repo_name)
+    pull_request_data = ('{{"title": "{}", "head": "{}:master",'
+	                     ' "base": "master"}}'.format(
                          environment['github_pull_request_title'],
                          environment['github_username']))
 
@@ -242,8 +247,11 @@ class pullRequestToGithubTestCase(unittest.TestCase):
 
     @mock.patch('subprocess.check_output', side_effect = mock_pull_request)
     def testPullRequestToGithub(self, mock_subprocess):
-        result = repo_scan.pull_request_to_github(self.main_repo_user, self.repo_name, self.environment)
-        assert result == ['curl', '--user', self.auth_string, self.url, '-d', self.pull_request_data], self.result
+        result = repo_scan.pull_request_to_github(self.main_repo_user, 
+		                                          self.repo_name, 
+												  self.environment)
+        assert result == ['curl', '--user', self.auth_string, self.url, 
+		                  '-d', self.pull_request_data], self.result
 
 #Tests the create_fork method, which creates a fork
 #of a remote repository.  This test does not actually
@@ -262,7 +270,8 @@ class createForkTestCase(unittest.TestCase):
 
     @mock.patch('subprocess.check_output', side_effect = mock_fork)
     def testFork(self, mock_subprocess):
-        result = repo_scan.create_fork(self.repo_name, self.main_repo_user, self.environment)
+        result = repo_scan.create_fork(self.repo_name, self.main_repo_user, 
+		                               self.environment)
         assert result == self.fork_command
 
 #This tests the check_fork_exists method, which determines

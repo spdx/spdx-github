@@ -123,7 +123,8 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
     else:
         suffix = configuration['output_file_name'][-5:]
         if(suffix != '.SPDX' and suffix != '.spdx'):
-            spdx_file_name = '{}.spdx'.format(configuration['output_file_name'])
+            spdx_file_name = '{}.spdx'.format(
+			                  configuration['output_file_name'])
         else:
             spdx_file_name = configuration['output_file_name']
 
@@ -160,7 +161,8 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
         #This is the path to the spdx file stored locally
         spdx_file_path = '{}{}'.format(repo_path, spdx_file_name)
     else:
-        spdx_file_path = '{}{}'.format(environment['local_spdx_path'], spdx_file_name)
+        spdx_file_path = '{}{}'.format(environment['local_spdx_path'], 
+		                               spdx_file_name)
 
     #Scan the extracted directory and put results in a named file.
     scan_successful = scan(repo_path, spdx_file_path, 'scancode',
@@ -179,9 +181,11 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
                      configuration['output_file_name']))
             spdx_file_name = configuration['output_file_name']
 	else:
-            copyfile(spdx_file_path, '{}{}'.format(environment['local_spdx_path'],
+            copyfile(spdx_file_path, '{}{}'.format(
+			                          environment['local_spdx_path'],
                      spdx_file_name))
-            spdx_file_path = '{}{}'.format(environment['local_spdx_path'], spdx_file_name)
+            spdx_file_path = '{}{}'.format(environment['local_spdx_path'], 
+			                               spdx_file_name)
         make_pull_request(spdx_file_name, repo, environment,
                           repo_name, main_repo_user)
 
@@ -269,7 +273,8 @@ def get_config_yml(directory, file_name):
 
 #Sync up a local repo with its remote repository.
 def sync_main_repo(repo_path, main_repo_user, repo_name, repo):
-    main_repo_url = ('https://www.github.com/{}/{}.git'.format(main_repo_user, repo_name))
+    main_repo_url = ('https://www.github.com/{}/{}.git'.format(main_repo_user, 
+	                                                           repo_name))
     origin = repo.create_remote('origin', main_repo_url)
     origin.fetch()
     repo.git.reset('--hard','origin/master')
@@ -293,19 +298,21 @@ def pull_request_to_github(main_repo_user, repo_name, environment):
     #pull request process.
 
     #This is the API URL to make a pull request
-    pull_request_url = ('https://api.github.com/repos/{}/{}/pulls'.format(main_repo_user,
-                        repo_name))
+    pull_request_url = ('https://api.github.com/repos/{}/{}/pulls'.format(
+	                    main_repo_user, repo_name))
     #This has the username and password from the environment file.
     #It is used to log in for API calls.
     auth_string = ('{}:{}'.format(environment['github_username'], 
                    environment['github_password']))
     #This is the data that will be posted for the pull request.
     #It tells the API what the pull request will be like.
-    pull_request_data = ('{{"title": "{}", "head": "{}:master", "base": "master"}}'.format(
+    pull_request_data = ('{{"title": "{}", "head": "{}:master",'
+	                     ' "base": "master"}}'.format(
                          environment['github_pull_request_title'], 
                          environment['github_username']))
 
-    pull_request_command = ['curl', '--user', auth_string, pull_request_url, '-d', pull_request_data]
+    pull_request_command = ['curl', '--user', auth_string, pull_request_url, 
+	                        '-d', pull_request_data]
 
     #Make the pull request to the main repository
     subprocess.check_output(pull_request_command)
