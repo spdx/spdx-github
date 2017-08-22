@@ -226,6 +226,7 @@ class repoScanTestCase(unittest.TestCase):
 #to github.  This test does not actually make a pull request
 #due to using a mock in place of the API call.
 class pullRequestToGithubTestCase(unittest.TestCase):
+    #Construct dummy input to call the pull request method 
     environment = {}
     environment['github_username'] = 'test_username'
     environment['github_password'] = 'test_password'
@@ -245,12 +246,15 @@ class pullRequestToGithubTestCase(unittest.TestCase):
     def mock_pull_request(arguments_list):
         return arguments_list
 
+    #Call the pull request method (the actual pull request portion is
+    #mocked)
     @mock.patch('subprocess.check_output', side_effect = mock_pull_request)
     def testPullRequestToGithub(self, mock_subprocess):
         result = repo_scan.pull_request_to_github(self.main_repo_user,
                                                   self.repo_name,
                                                   self.environment)
 
+        #Make sure the command used for the pull request was correct
         assert result == ['curl', '--user', self.auth_string, self.url,
 		                  '-d', self.pull_request_data], self.result
 
@@ -258,6 +262,7 @@ class pullRequestToGithubTestCase(unittest.TestCase):
 #of a remote repository.  This test does not actually
 #create a fork and replaces the call with a mock.
 class createForkTestCase(unittest.TestCase):
+    #Construct testing input for the fork method
     environment = {}
     environment['github_username'] = 'test_username'
     main_repo_user = 'test_username_main'
@@ -269,6 +274,8 @@ class createForkTestCase(unittest.TestCase):
     def mock_fork(arguments_list):
         return arguments_list
 
+    #Call the fork method using the testing input and
+    #check that the mocked fork command was correctly called.
     @mock.patch('subprocess.check_output', side_effect = mock_fork)
     def testFork(self, mock_subprocess):
         result = repo_scan.create_fork(self.repo_name, self.main_repo_user,

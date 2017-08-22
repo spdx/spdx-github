@@ -24,9 +24,12 @@ app = Flask(__name__)
 def github_webhooks():
     if request.method == 'POST':
         data = request.data
+        #Parse the json that was given through the webhook
         parsed_data = json.loads(data)
+        #Construct a zip url using the parsed json response
         zipball = ('https://api.github.com/repos/{}/zipball'.format(
                    parsed_data['repository']['full_name']))
+        #Run a scan using the constructed url
         repo_scan.begin_scan(zipball)
         return "Post"
     else:

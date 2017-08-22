@@ -56,14 +56,18 @@ def begin_scan(url):
     #Get data from both config and env
     scan_info= get_scan_info(url)
 
-    
+    #Check which scanner was selected
     scanner = scan_info['scanner']
+    #Make sure the scanner exists
     if(scanner not in scan_info):
         return False
 
+    #Get the location of the scanner
     scanner_location = scan_info[scanner]
     output_file = scan_info['output_file_name']
 
+    #If the scanner is local, run a local scan.
+    #Otherwise, use the web API
     if(scanner_location == 'local'):
         repo_scan(url)
     else:
