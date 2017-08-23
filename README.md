@@ -248,4 +248,4 @@ If you choose DoSOCs as your scanner option, you will need to install it.  Follo
 
 ## (Optional) Add a new scanner:
 
-Currently supported scanners are ScanCode and DoSOCSv2.  If you would like to use a scanner other than these with spdx-github, it will require a minor change to the source code as well as additions to the environment file.  View full instructions on adding a new scanner here: https://github.com/spdx/spdx-github/wiki/Adding-a-New-Scanner-to-spdx-github
+Currently supported scanners are ScanCode and DoSOCSv2.  If you would like to use a scanner other than these with spdx-github, there are two options.  The first option is to make a minor change to the source code as well as additions to the environment file.  View full instructions on adding a new scanner this way here: https://github.com/spdx/spdx-github/wiki/Adding-a-New-Scanner-to-spdx-github.  The second option is to use the web API and create a server that can interface with spdx-github.  Instructions for creating a web API server are here: https://github.com/spdx/spdx-github/wiki/Creating-a-remote-API-scan-server
