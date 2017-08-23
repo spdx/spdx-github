@@ -1,0 +1,18 @@
+github_username: bot_username
+github_password: bot_password
+github_pull_request_title: SPDX Document Automatic Update
+git_name: Bot's Name for Commits
+git_email: bots_email@email.com
+git_commit_message: SPDX Document Automatic Update
+gmail_email: bot_email@gmail.com
+gmail_password: bot_email_password
+notification_email: email_to_notify@email.com
+notification_subject: New SPDX Document Ready
+notification_message: Your new SPDX document is ready.
+send_notification_email: True
+send_pull_request: True
+local_spdx_path: ../
+scancode: local
+scancode_download: http://www.example2.com
+dosocsv2: http://www.example3.com
+dosocsv2_download: http://www.example4.com
