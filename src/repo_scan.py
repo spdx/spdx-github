@@ -169,7 +169,7 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
                                        spdx_file_name)
 
     #Scan the extracted directory and put results in a named file.
-    scan_successful = scan(repo_path, spdx_file_path, 'scancode',
+    scan_successful = scan(repo_path, spdx_file_path, configuration['scanner'],
                           configuration['output_type'])
 
     #If the scan was not successful, don't try to do a pull request or email.
