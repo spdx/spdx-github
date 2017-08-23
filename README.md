@@ -50,64 +50,80 @@ In the folder for spdx-github you will find the environment.example.yml file.  C
 Next, modify environment.yml to meet your needs.  The following are descriptions of each of the settings in environment.yml:
 
 #### Settings related to pull request
-    SPDX-GitHub allows you to receive a pull request with the newly created SPDX document.  The pull request will be sent to the repository that was scanned.  In order to send the pull request, spdx-github will need you to have a GitHub account, ideally a dummy or bot account, whose username and password you will add to the environment file.  If you do not wish to provide an account or do not wish to receive pull requests, set the send_pull_request setting to False.  If this is set to False, you should not need to pay attention to the pull request related settings.  The new spdx document will be created on your local machine if you opted not to use a pull request.
+SPDX-GitHub allows you to receive a pull request with the newly created SPDX document.  The pull request will be sent to the repository that was scanned.  In order to send the pull request, spdx-github will need you to have a GitHub account, ideally a dummy or bot account, whose username and password you will add to the environment file.  If you do not wish to provide an account or do not wish to receive pull requests, set the send_pull_request setting to False.  If this is set to False, you should not need to pay attention to the pull request related settings.  The new spdx document will be created on your local machine if you opted not to use a pull request.
 
 send_pull_request
-    Set this to True if you want the scanned repository to receive a pull request with the new spdx document.  Set it to False if you do not want to receive a pull request.
+
+Set this to True if you want the scanned repository to receive a pull request with the new spdx document.  Set it to False if you do not want to receive a pull request.
 
 github_username
-    This is the username for a dummy or bot github account.
+
+This is the username for a dummy or bot github account.
 
 github_password
-    This is the password to the dummy GitHub account for github_username.
+
+This is the password to the dummy GitHub account for github_username.
 
 github_pull_request_title
-    This is the title you would like for a pull request containing the new spdx document.
+
+This is the title you would like for a pull request containing the new spdx document.
 
 git_name
-    This is the name that will be associated with the commit for the new spdx document in the pull request.
+
+This is the name that will be associated with the commit for the new spdx document in the pull request.
 
 git_email
-    This is the email address that will be associated with the commit for the new spdx document.
+
+This is the email address that will be associated with the commit for the new spdx document.
 
 git_commit_message
-    This is the commit message you would like for the new spdx document's commit.
+
+This is the commit message you would like for the new spdx document's commit.
 
 #### Settings related to email notification
-    SPDX-GitHub can send you a notification email when a scan has been completed.  If you want to receive an email, set send_notification_email to True.  If you do not want an email notification, set it to False.  The notification email will be sent from a gmail account whose email address and password are provided in this environment file.  If you set email notifications to False, you do not need to provide an account or password.
+SPDX-GitHub can send you a notification email when a scan has been completed.  If you want to receive an email, set send_notification_email to True.  If you do not want an email notification, set it to False.  The notification email will be sent from a gmail account whose email address and password are provided in this environment file.  If you set email notifications to False, you do not need to provide an account or password.
 
 send_notification_email
-    Set this to True if you want to receive an email when a scan is complete.  Set it to False if you would not like to receive an email.
+
+Set this to True if you want to receive an email when a scan is complete.  Set it to False if you would not like to receive an email.
 
 gmail_email
-    This is the gmail email address that the notification email will come from.
+
+This is the gmail email address that the notification email will come from.
 
 gmail_password
-    This is the password to the above email account
+
+This is the password to the above email account
 
 notification_email
-    This is the email address to which you would like the notification email to be sent.
+
+This is the email address to which you would like the notification email to be sent.
 
 notification_subject
-    This is the subject you would like for the notification email.
+
+This is the subject you would like for the notification email.
 
 notification_message
-    This is the content you would like to appear in the notification email message.
+
+This is the content you would like to appear in the notification email message.
 
 #### Settings related to the local version of the spdx document
-    Although it can create a pull request, spdx-github also creates a local copy of the new spdx document.  This setting is the path to the directory in which you would like the new spdx document to be found.  This setting is necessary even if you have set pull requests to True, although you can leave it as a simple default value.
+Although it can create a pull request, spdx-github also creates a local copy of the new spdx document.  This setting is the path to the directory in which you would like the new spdx document to be found.  This setting is necessary even if you have set pull requests to True, although you can leave it as a simple default value.
 
 local_spdx_path
-    This is the path to the directory where you would like to find the new spdx document.
+
+This is the path to the directory where you would like to find the new spdx document.
 
 #### Settings related to scanners
-    SPDX-GitHub supports multiple scanners, and you can select which scanner to use in the configuration file that is stored with the repository you are trying to scan.  The scanner to use is selected using the configuration.yml file (described later in this document) that is stored with the repository to be scanned.  The environment file tells spdx-github whether the scanner is installed locally or on a remote machine.  The format is the following (with scannername replaced with the name of the scanner).  There can be more than one scanner in the environment file as long as each scanner name is unique:
+SPDX-GitHub supports multiple scanners, and you can select which scanner to use in the configuration file that is stored with the repository you are trying to scan.  The scanner to use is selected using the configuration.yml file (described later in this document) that is stored with the repository to be scanned.  The environment file tells spdx-github whether the scanner is installed locally or on a remote machine.  The format is the following (with scannername replaced with the name of the scanner).  There can be more than one scanner in the environment file as long as each scanner name is unique:
 
 scannername
-    This can be set to either 'local' if the scanner is installed on the same machine as spdx-github, or to a url if the scanner is installed on a remote machine.  If it is remote, an API server (described later in this document) will need to be running on the remote machine.
+
+This can be set to either 'local' if the scanner is installed on the same machine as spdx-github, or to a url if the scanner is installed on a remote machine.  If it is remote, an API server (described later in this document) will need to be running on the remote machine.
 
 scannername_download
-    This is not necessary if the scanner is local.  If the scanner is remote, this is the url from which new spdx files will be served so that
+
+This is not necessary if the scanner is local.  If the scanner is remote, this is the url from which new spdx files will be served so that
 spdx-github can download them.
 
 ### Set up the configuration.yml file
@@ -115,13 +131,16 @@ spdx-github can download them.
 Create a file named configuration.yml and store it with the repository or repositories you are going to scan.  The configuration file includes the following options:
 
 output_file_name
-    This is the name of the spdx file you would like to be created.
+
+This is the name of the spdx file you would like to be created.
 
 output_type
-    This specifies the spdx format you would like.  The possible options are rdf or tag-value.
+
+This specifies the spdx format you would like.  The possible options are rdf or tag-value.
 
 scanner
-    This is the name of the scanner you would like to use.  For example, 'scancode'.  The name of the scanner in the configuration file should match exactly to the scanner name in the environment file.
+
+This is the name of the scanner you would like to use.  For example, 'scancode'.  The name of the scanner in the configuration file should match exactly to the scanner name in the environment file.
 
 ### Set up SSH
 
