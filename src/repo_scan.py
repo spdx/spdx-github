@@ -48,7 +48,7 @@ def main(url):
     scan_successful = begin_scan(repo_zip_url)
 
     if(not scan_successful):
-        print('Scan failed 2')
+        print('Scanner not found in environment file.')
 
 #This selects whether we are using a local scanner or a
 #remote API call.
@@ -175,7 +175,9 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
     #If the scan was not successful, don't try to do a pull request or email.
     #Notify of failure.
     if(not scan_successful):
-        return 'Scan Failed 1'
+        return ('Scanner not found.'  
+                'Please check scanner setting in configuration file.'
+                'Scanner name must exactly match spdx-github scan method.')
 
     #If we are sending a pull request, 
     #get the necessary information then make it.
