@@ -48,7 +48,7 @@ def main(url):
     scan_successful = begin_scan(repo_zip_url)
 
     if(not scan_successful):
-        print('Scan failed')
+        print('Scan failed 2')
 
 #This selects whether we are using a local scanner or a
 #remote API call.
@@ -175,7 +175,7 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
     #If the scan was not successful, don't try to do a pull request or email.
     #Notify of failure.
     if(not scan_successful):
-        return 'Scan Failed'
+        return 'Scan Failed 1'
 
     #If we are sending a pull request, 
     #get the necessary information then make it.
@@ -220,6 +220,9 @@ def scan(directory_to_scan, output_file_name, scanner, output_type):
     elif(scanner == 'dosocsv2'): #DoSocs scan
         scan_output = subprocess.check_output(['dosocs2','oneshot',
                                                directory_to_scan])
+        fo = open(output_file_name, 'w+')
+        fo.write(scan_output)
+        fo.close()
         return True
     else:
         #This should be reached if a scanner that is not yet implemented
