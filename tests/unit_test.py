@@ -159,7 +159,7 @@ class SyncRepoTestCase(unittest.TestCase):
 
     def testRepoSynced(self):
         #Output of git diff should be empty if they are synced
-        assert self.output_string == ""
+        assert self.output_string == ''
 
 #Test the commit_file method which adds a file and makes a
 #commit
@@ -304,5 +304,5 @@ class findFileLocationTestCase(unittest.TestCase):
     def testFileLocation(self):
          assert self.location == './test2/', self.location
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()
