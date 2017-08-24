@@ -31,9 +31,9 @@ def github_webhooks():
                    parsed_data['repository']['full_name']))
         #Run a scan using the constructed url
         repo_scan.begin_scan(zipball)
-        return "Post"
+        return 'Post'
     else:
-        return "Get"
+        return 'Get'
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run()

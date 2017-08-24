@@ -34,7 +34,7 @@ app = Flask(__name__)
 def start_scan():
     #Look at the last id used.  This will be incemented to keep the id
     #unique.
-    fo = open('./last_id', "r+")
+    fo = open('./last_id', 'r+')
     task_id = fo.read()
     fo.close()
 
@@ -64,7 +64,7 @@ def start_scan():
 
     #Increment the id and write the the id file.
     task_id = int(task_id) + 1
-    fo = open('./last_id', "w+")
+    fo = open('./last_id', 'w+')
     fo.write(str(task_id))
     fo.close()
 
@@ -109,7 +109,7 @@ class run_new_scan(threading.Thread):
         result = repo_scan.repo_scan(self.url, True, self.task_id)
         #if we get back that the scan failed, create the .fail file.
         if(result == 'Scan Failed'):
-            fo = open('{}.fail'.format(self.task_id), "w+")
+            fo = open('{}.fail'.format(self.task_id), 'w+')
             fo.write('Scan Failed')
             fo.close()
 

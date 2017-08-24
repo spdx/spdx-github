@@ -62,7 +62,7 @@ def run_remote_scan(url, output_file, scanner):
             print('scan is complete')
             spdx_file = requests.get('{}{}.spdx'.format(download_url,
                                      parsed_data['id']))
-            fo = open(output_file, "w+")
+            fo = open(output_file, 'w+')
             fo.write(spdx_file.text)
             fo.close()
         else:

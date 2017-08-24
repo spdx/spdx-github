@@ -48,7 +48,7 @@ def main(url):
     scan_successful = begin_scan(repo_zip_url)
 
     if(not scan_successful):
-        print("Scan failed")
+        print('Scan failed')
 
 #This selects whether we are using a local scanner or a
 #remote API call.
@@ -144,12 +144,12 @@ def repo_scan(repo_zip_url, remote = False, task_id = 0):
     #get the username and repo name from the zip url using a regex.
     #The zip url could be formatted in multiple ways, so we handle
     #multiple url formats.
-    m = re.match(r"https://github.com/(\w+)/(\w+)/", repo_zip_url)
+    m = re.match(r'https://github.com/(\w+)/(\w+)/', repo_zip_url)
     if(m):
         main_repo_user = m.group(1)
         repo_name = m.group(2)
     else:
-        m = re.match(r"https://api.github.com/repos/(\w+)/(\w+)/zipball",
+        m = re.match(r'https://api.github.com/repos/(\w+)/(\w+)/zipball',
                      repo_zip_url)
         main_repo_user = m.group(1)
         repo_name = m.group(2)
@@ -402,7 +402,7 @@ def push_to_remote(repo, repo_name, environment):
     #Change its remote to the fork of the main repository,
     #and then push the new SPDX commit
     origin = repo.create_remote('origin', ssh_remote)
-    repo.git.push("origin", "HEAD:master")
+    repo.git.push('origin', 'HEAD:master')
 
 #Check that the url for the zip file can be reached.
 def check_valid_url(repo_zip_url):
@@ -451,4 +451,4 @@ def find_file_location(directory, file_name):
         file_directory = '{}/'.format(file_directory)
     return file_directory
 
-if __name__ == "__main__": main()
+if __name__ == '__main__': main()
