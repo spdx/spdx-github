@@ -1,3 +1,6 @@
+# Archive Status
+This repository has been moved to archive status as of 9 January 2022
+
 # spdx-github
 SPDX Github Integration Tools
 
